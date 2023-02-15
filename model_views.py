@@ -227,8 +227,7 @@ class invoiceDetails(MyModelView):
         return False
 
     column_display_pk = False
-    column_default_sort = ('invoice_id', 'test_name', 'amount',
-                           'created_by', 'created_date', 'updated_by', 'updated_date', True)
+    column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['invoice_id', 'test_name', 'amount',
                               'created_by', 'created_date', 'updated_by', 'updated_date']
@@ -239,7 +238,7 @@ class invoiceDetails(MyModelView):
     can_edit = True
     column_list = ('invoice_id','test_name','amount','created_by','created_date','updated_by','updated_date')
     can_view_details = True
-    page_size = 100
+    page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
@@ -256,8 +255,7 @@ class paymentHistory(MyModelView):
         return False
 
     column_display_pk = False
-    column_default_sort = ('invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
-                           'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date', True)
+    column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
                               'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
@@ -269,7 +267,7 @@ class paymentHistory(MyModelView):
     can_edit = True
     column_list = ('invoice_id','payment_mode','total_amount','paid_amount','balance_amt','status','payment_collected_by','payment_collected_date')
     can_view_details = True
-    page_size = 100
+    page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
@@ -285,8 +283,7 @@ class pickupDetails(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('pickup_id', 'sample_id', 'picked_by',
-                           'picked_date', 'remarks', 'created_by', True)
+    column_default_sort = ('pickup_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['pickup_id', 'sample_id',
                               'picked_by', 'picked_date', 'remarks', 'created_by']
@@ -297,7 +294,7 @@ class pickupDetails(MyModelView):
     can_edit = True
     column_list = ('pickup_id','sample_id','picked_by','picked_date','remarks','created_by')
     can_view_details = True
-    page_size = 100
+    page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
@@ -313,8 +310,7 @@ class receiveDetails(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',
-                           'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date', True)
+    column_default_sort = ('receive_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['receive_id', 'sample_id', 'received_by', 'received_date',
                               'remarks', 'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date']
@@ -325,7 +321,7 @@ class receiveDetails(MyModelView):
     can_edit = True
     column_list = ('receive_id','sample_id','received_by','received_date','remarks','created_by','vet_remarks','vetremarks_updated_by','vetremarks_updated_date')
     can_view_details = True
-    page_size = 100
+    page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
@@ -341,17 +337,16 @@ class sampleStock(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'created_time', 'counciler_status', 'customer_status', 'pickup_status', 'created_date',
-                           'total_sample_price', 'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id', True)
+    column_default_sort = ('sample_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','created_time','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
     column_filters = ['sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','created_time','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
-    column_editable_list = ['sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','created_time','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
+    column_editable_list = ['sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','created_time','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
     can_create = False
     can_edit = True
     column_list = ('sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','created_time','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','bread','location_id','species_id','specimen_id')
     can_view_details = True
-    page_size = 100
+    page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
@@ -369,11 +364,11 @@ class Allspecies(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('species_id', 'species_name', True)
+    column_default_sort = ('species_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['species_id', 'species_name']
     column_filters = ['species_id', 'species_name']
-    column_editable_list = ['species_id', 'species_name']
+    column_editable_list = [ 'species_name']
     can_create = True
     can_edit = True
     column_list = ('species_id','species_name')
@@ -396,11 +391,11 @@ class Allspecimen(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('specimen_id', 'specimen_name', True)
+    column_default_sort = ('specimen_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['specimen_id', 'specimen_name']
     column_filters = ['specimen_id', 'specimen_name']
-    column_editable_list = ['specimen_id', 'specimen_name']
+    column_editable_list = [ 'specimen_name']
     can_create = True
     can_edit = True
     column_list = ('specimen_id', 'specimen_name')
@@ -421,20 +416,18 @@ class analyticalTest(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('test_id', 'test_name', 'sample_id', 'outcome_result',
-                           'test_outcome_created_by', 'test_outcome_created_date', 'status', True)
+    column_default_sort = ('test_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['test_id', 'test_name', 'sample_id', 'outcome_result',
-                              'test_outcome_created_by', 'test_outcome_created_date', 'status']
+    column_searchable_list = ['test_id', 'status']
     column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
                       'test_outcome_created_by', 'test_outcome_created_date', 'status']
-    column_editable_list = ['test_id', 'test_name', 'sample_id', 'outcome_result',
+    column_editable_list = ['test_name', 'sample_id', 'outcome_result',
                             'test_outcome_created_by', 'test_outcome_created_date', 'status']
     can_create = False
     can_edit = True
     column_list = ('test_id','test_name','sample_id','outcome_result','test_outcome_created_by','test_outcome_created_date','status')
     can_view_details = True
-    page_size = 100
+    page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
@@ -450,14 +443,13 @@ class ourEmployee(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('id', 'emp_id', 'emp_name', 'password', 'designation',
-                           'status', 'email_id', 'phone_no', 'address', 'location', 'usercode', True)
+    column_default_sort = ('id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['id', 'emp_id', 'emp_name', 'password', 'designation',
                               'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
     column_filters = ['id', 'emp_id', 'emp_name', 'password', 'designation',
                       'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
-    column_editable_list = ['id', 'emp_id', 'emp_name', 'password', 'designation',
+    column_editable_list = [ 'emp_id', 'emp_name', 'password', 'designation',
                             'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
     can_create = False
     can_edit = True
@@ -479,16 +471,16 @@ class invoices(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total', True)
+    column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total']
     column_filters = ['invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total']
-    column_editable_list = ['invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total']
+    column_editable_list = ['sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total']
     can_create = False
     can_edit = True
     column_list = ('invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total')
     can_view_details = True
-    page_size = 100
+    page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
