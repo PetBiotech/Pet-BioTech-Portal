@@ -1,0 +1,33 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1">
+            <h1>Test Name</h1>
+            {% if not current_user.is_authenticated %}
+                <p class="lead">
+                    Authentication
+                </p>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Blah Blah Blah add some things.
+                </p>
+                <ul>
+                    <li>username: <b>admin</b></li>
+                    <li>password: <b>admin</b></li>
+                </ul>
+                <p>
+                    <a class="btn btn-primary" href="{{ url_for('security.login') }}">
+                        Login
+                    </a>
+                    <!-- <a class="btn btn-default" href="{{ url_for('security.register') }}">
+                        Register
+                    </a> -->
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
