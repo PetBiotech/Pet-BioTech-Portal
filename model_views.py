@@ -344,7 +344,7 @@ class sampleStock(MyModelView):
     column_editable_list = ['sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
     can_create = False
     can_edit = True
-    column_list = ('sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','bread','location_id','species_id','specimen_id')
+    column_list = ('sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','email_id','created_by','created_date','updated_by','updated_date','age','gender','pincode','bread','location_id','species_id','specimen_id')
     can_view_details = True
     page_size = 50
     create_modal = True

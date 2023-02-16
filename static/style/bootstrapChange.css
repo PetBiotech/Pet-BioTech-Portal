@@ -185,9 +185,9 @@ body {
     min-width: 50px;
 }
 .model-list tr td{
-    min-width: 75px;
+    min-width: auto;
     max-width: 150px;
-    white-space: nowrap;
+    /* white-space: nowrap; */
     overflow: hidden;
     text-overflow: ellipsis;
 }
