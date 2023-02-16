@@ -184,6 +184,13 @@ body {
 .model-list tr td:first-child {
     min-width: 50px;
 }
+.model-list tr td{
+    min-width: 75px;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .model-list>tbody>tr>td {
     vertical-align: middle;
