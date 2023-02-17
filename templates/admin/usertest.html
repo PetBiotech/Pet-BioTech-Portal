@@ -18,28 +18,39 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="clinicname" class="control-label col-xs-4">Clinic Name</label>
+      <label for="clinicname" class="control-label col-xs-4">Sample Name</label>
       <div class="col-xs-8">
         <input id="clinicname" name="clinicname" placeholder="Clinic/Referral Name" type="text" class="form-control">
       </div>
     </div>
     <div class="form-group">
-      <label for="phno" class="control-label col-xs-4">Phone No <span
-          style="color: red; font-size: 16px;">*</span></label>
+      <label for="clinicBackground" class="control-label col-xs-4">Clinical Background</label>
       <div class="col-xs-8">
-        <input id="phno" name="phno" placeholder="Phone Number" type="number" required="required" class="form-control">
+        <textarea id="clinicBackground" name="clinicBackground" placeholder="Clinical Background/Remarks"
+          class="form-control" style="min-height: 150px;"></textarea>
       </div>
     </div>
-    <div class="form-group">
+    <!-- <div class="form-group">
       <label for="petname" class="control-label col-xs-4">Pet Name</label>
       <div class="col-xs-8">
         <input id="petname" name="petname" placeholder="Pet Name" type="text" class="form-control">
       </div>
-    </div>
+    </div> -->
     <div class="form-group">
       <label for="breed" class="control-label col-xs-4">Breed</label>
       <div class="col-xs-8">
         <input id="breed" name="breed" placeholder="Breed" type="text" class="form-control">
+      </div>
+    </div>
+    <div class="form-group" style="display: flex;justify-content: center;align-items: flex-start;">
+      <label class="control-label col-xs-4">Gender</label>
+      <div class="col-xs-8" style="cursor: pointer;">
+        <input type="radio" name="gender" value="Male" id="male" style="margin-right: 5px;"><label for="male"
+          style="cursor: pointer;">Male</label>
+        <br><input type="radio" name="gender" value="Female" id="female" style="margin-right: 5px;"><label for="female"
+          style="cursor: pointer;">Female</label>
+        <br><input type="radio" name="gender" value="Others" id="others" style="margin-right: 5px;"><label for="others"
+          style="cursor: pointer;">Others</label>
       </div>
     </div>
     <div class="form-group">
@@ -49,49 +60,78 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="species" class="control-label col-xs-4">Species <span
+      <label for="number" class="control-label col-xs-4">No of tests <span
           style="color: red; font-size: 16px;">*</span></label>
       <div class="col-xs-8">
-        <select id="species" name="species" required="required" class="select form-control">
-          <option value="Canine">Canine</option>
-          <option value="Feline">Feline</option>
-          <option value="Equine">Equine</option>
-          <option value="Avian">Avian</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="checkbox" class="control-label col-xs-4">Booked Tests <span
-          style="color: red; font-size: 16px;">*</span></label>
-      <div class="col-xs-8">
-        <label class="checkbox-inline">
-          <input type="checkbox" name="testBox1" checked="checked" value="rabbit" id="testBox1" class="testBox testBox1">
-          Rabbit
-        </label>
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="sample" class="control-label col-xs-4">Sample Required <span
-          style="color: red; font-size: 16px;">*</span></label>
-      <div class="col-xs-8">
-        <select multiple="multiple" id="sample" name="sample" required="required" class="select form-control"
-          aria-describedby="sampleHelpBlock">
-          <option value="Blood">Blood</option>
-          <option value="Fluid">Fluid</option>
-          <option value="Swab">Swab</option>
-        </select>
-        <span id="sampleHelpBlock" class="help-block">Press ctrl to select multiple samples.</span>
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="amount" class="control-label col-xs-4">Amount<span
-          style="color: red; font-size: 16px;">*</span></label>
-      <div class="col-xs-8">
-        <input id="amount" name="amount" placeholder="Amount to be Paid" type="number" class="form-control"
-          required="required">
+        <input type="number" name="no_of_test" id="no_of_test" class="form-control no_of_test">
       </div>
     </div>
   </div>
+  <!-- Middle Form -->
+  <!-- 
+
+
+
+
+
+
+
+   -->
+  <div class="middleForm formDiv">
+    <!-- species -->
+    <div class="form-group">
+      <label for="species" class="control-label col-xs-3">Species</label>
+      <div class="col-xs-9">
+        <select id="species" name="species" required="required" class="select form-control">
+          {% for row in speciesData %}
+          <option value="{{ row[0] }}">{{ row[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <!-- specimens -->
+    <div class="form-group">
+      <p class="col-xs-12" style="font-weight: bolder;">Specimens</p>
+      <div class="col-xs-12">
+        <select id="sample" name="sample" required="required" class="select form-control"
+          aria-describedby="sampleHelpBlock">
+          {% for row in specimenData %}
+          <option value="{{ row[0] }}">{{ row[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <!-- 
+
+
+
+
+     -->
+    <!-- tests -->
+    <div class="form-group">
+      <p class="col-xs-12" style="font-weight: bolder;">Tests</p>
+      <div class="col-xs-8 testBlock" id="testBlock">
+        <!-- the tests -->
+        <!-- <div class="miniTestBlock" id="miniTestBlock1">
+          <p class="testTitle" id="testTitel1">Test 11</p>
+          <select class="col-xs-8 form-control selectTest" id="selectTest1">
+            <option class="optionTest" id="optionTest1">Hello</option>
+          </select>
+          <div class="cross" id="cross1">X</div>
+        </div> -->
+      </div>
+      <p class="addButton" onclick="addTest()">+Add Tests</p>
+    </div>
+  </div>
+  <!-- 
+
+
+
+
+
+
+
+   -->
   <div class="rightForm formDiv">
     <div class="form-group">
       <label for="state" class="control-label col-xs-4">State <span
@@ -140,7 +180,12 @@
     <div class="form-group">
       <label for="city" class="control-label col-xs-4">City <span style="color: red; font-size: 16px;">*</span></label>
       <div class="col-xs-8">
-        <input id="city" name="city" placeholder="City" type="text" class="form-control" required="required">
+        <select id="city" name="city" required="required" class="select form-control"
+          aria-describedby="sampleHelpBlock">
+          {% for row in locationData %}
+          <option value="{{ row[0] }}">{{ row[1] }}</option>
+          {% endfor %}
+        </select>
       </div>
     </div>
     <div class="form-group">
@@ -158,6 +203,20 @@
           required="required">
       </div>
     </div>
+    <div class="form-group">
+      <label for="phno" class="control-label col-xs-4">Phone No <span
+          style="color: red; font-size: 16px;">*</span></label>
+      <div class="col-xs-8">
+        <input id="phno" name="phno" placeholder="Phone Number" type="number" required="required" class="form-control">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="email" class="control-label col-xs-4">Email <span
+          style="color: red; font-size: 16px;">*</span></label>
+      <div class="col-xs-8">
+        <input id="email" name="email" placeholder="Email" type="email" required="required" class="form-control">
+      </div>
+    </div>
     <div class="form-group" style="display: flex;margin-top: 25px;">
       <div class="col-xs-offset-4 col-xs-4">
         <button name="submit" id="submit-btn" type="submit" class="btn btn-primary"
@@ -171,36 +230,52 @@
 </form>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static',filename='script/createTest.js') }}"></script>
+<script type="text/javascript">
+  let numTests = 0; // keep track of the number of tests added
+
+  function addTest() {
+  numTests++; // increment the test counter
+  const miniTestBlock = document.createElement("div");
+  miniTestBlock.classList.add("miniTestBlock");
+  miniTestBlock.id = "miniTestBlock" + numTests;
+
+  const testTitle = document.createElement("p");
+  testTitle.classList.add("testTitle");
+  testTitle.id = "testTitle" + numTests;
+  testTitle.innerText = "Test " + numTests;
+  
+  const selectTest = document.createElement("select");
+  selectTest.classList.add("col-xs-8", "form-control", "selectTest");
+  selectTest.id = "selectTest" + numTests;
+//write for loop to add first 5 numbers
+
+
+// let testData = "{{ clinicalTestData }}"; //'[[&#39;A&#39;], [&#39;s&#39;], [&#39;ggg&#39;]]';
+{% for test in clinicalTestData %}
+const option{{ loop.index }} = document.createElement("option");
+option{{ loop.index }}.classList.add("optionTest");
+option{{ loop.index }}.id = "optionTest{{ loop.index }}";
+option{{ loop.index }}.innerText = "{{ test.test_name }}";
+option{{ loop.index }}.value = "{{ test.test_id }}";
+
+selectTest.appendChild(option{{ loop.index }});
+{% endfor %}
+
+
+  const cross = document.createElement("div");
+  cross.classList.add("cross");
+  cross.id = "cross" + numTests;
+  cross.innerText = "X";
+
+  cross.addEventListener("click", () => {
+  miniTestBlock.remove();
+  });
+
+  miniTestBlock.appendChild(testTitle);
+  miniTestBlock.appendChild(selectTest);
+  miniTestBlock.appendChild(cross);
+
+  document.getElementById('testBlock').appendChild(miniTestBlock);
+}
+</script>
 {% endblock body %}
-<!-- 
-  // // Get the form element
-  // var form = document.getElementById("createTestForm");
-
-  // // Listen for the form's submit event
-  // form.addEventListener("submit", function (event) {
-  // event.preventDefault();
-
-  // // Get the form data
-  // var data = new FormData(form);
-
-  // // Create an XMLHttpRequest object
-  // var xhr = new XMLHttpRequest();
-
-  // // Open the request and set the method to "POST"
-  // xhr.open("POST", "/submit", true);
-
-  // // Send the request with the form data
-  // xhr.send(data);
-  // });
-
-  # @app.route("/submit", methods=["POST"])
-  # def submit():
-  # # Get the form data
-  # data = request.form
-
-  # # Do something with the data, like calling a function
-  # generate_id(data)
-  # # process_data(data)
-
-  # return "Data received"
- -->

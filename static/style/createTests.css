@@ -8,10 +8,95 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
-.createTestForm{
+select{
+    cursor: pointer;
+}
+.createTestForm {
     background-color: #f4f4f4;
-    padding:25px 10px;
+    padding: 25px 10px;
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
+    gap: 10px;
+    background-color: white;
+}
+
+.formDiv {
+    background-color: white;
+    padding: 30px 25px;
+    border-radius: 10px;
+    width: fit-content;
+    box-shadow: rgba(200, 229, 255, 0.203) 6px 2px 16px 0px,
+        rgba(136, 165, 191, 0.39) -3px -2px 16px 0px;
+}
+.middleForm{
+    max-width: 25%;
+}
+@media screen and (max-width:660px) {
+    .middleForm {
+        min-width: 60%;
+        max-width: 90%;
+    }
+}
+
+
+
+/* test blocks */
+
+.testBlock{
+    width: 100%;
+    display: block;
+}
+.addButton{
+    color:rgb(0, 109, 176);
+    cursor: pointer;
+    font-weight: bolder;
+    float: right;
+    margin-top: 10px;
+    transition: all 0.10s ease-in;
+    padding:5px 10px;
+    border-radius: 5px;
+}
+.addButton:hover{
+    background-color: rgb(0, 109, 176);
+    color: white;
+}
+.testBlock .miniTestBlock{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.15s ease-in;
+    padding:7.5px 0;
+}
+.testBlock .miniTestBlock .testTitle{
+    font-weight: bold;
+    color: rgb(0, 140, 227);
+    margin: 5px;
+    font-size: 1em;
+    cursor: context-menu;
+    display: none;
+}
+.testBlock .miniTestBlock .cross{
+    color:red;
+    font-weight: bolder;
+    font-size: 18px;
+    cursor: pointer;
+    padding:0 7px;
+    border-radius: 50px;
+    margin:0 5px;
+    transition: all 0.10s ease-in;
+    max-width: 10%;
+    font-size: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.testBlock .miniTestBlock .cross:hover{
+    background-color: red;
+    color: white;
+    transform: scale(1.05);
+}
+.testBlock .miniTestBlock .selectTest{
+    min-width: 65%;
 }

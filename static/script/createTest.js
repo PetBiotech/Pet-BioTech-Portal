@@ -1,3 +1,3 @@
-const onSubmitForm=()=>{
+const onSubmitForm = () => {
     e.preventDefault();
 }

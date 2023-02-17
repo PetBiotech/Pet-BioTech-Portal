@@ -1,1 +1,1 @@
-sample_stock
+clinicalTestData

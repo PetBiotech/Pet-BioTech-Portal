@@ -234,7 +234,7 @@ class invoiceDetails(MyModelView):
     column_filters = ['invoice_id', 'test_name', 'amount',
                       'created_by', 'created_date', 'updated_by', 'updated_date']
     column_editable_list = ['test_name', 'amount']
-    can_create = False
+    can_create = True
     can_edit = True
     column_list = ('invoice_id','test_name','amount','created_by','created_date','updated_by','updated_date')
     can_view_details = True
@@ -290,7 +290,7 @@ class pickupDetails(MyModelView):
     column_filters = ['pickup_id', 'sample_id',
                       'picked_by', 'picked_date', 'remarks', 'created_by']
     column_editable_list = ['picked_by', 'picked_date', 'remarks', 'created_by']
-    can_create = False
+    can_create = True
     can_edit = True
     column_list = ('pickup_id','sample_id','picked_by','picked_date','remarks','created_by')
     can_view_details = True
@@ -317,7 +317,7 @@ class receiveDetails(MyModelView):
     column_filters = ['receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',
                       'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date']
     column_editable_list = ['remarks','vet_remarks']
-    can_create = False
+    can_create = True
     can_edit = True
     column_list = ('receive_id','sample_id','received_by','received_date','remarks','created_by','vet_remarks','vetremarks_updated_by','vetremarks_updated_date')
     can_view_details = True
@@ -342,7 +342,7 @@ class sampleStock(MyModelView):
     column_searchable_list = ['sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
     column_filters = ['sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
     column_editable_list = ['sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
-    can_create = False
+    can_create = True
     can_edit = True
     column_list = ('sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','email_id','created_by','created_date','updated_by','updated_date','age','gender','pincode','bread','location_id','species_id','specimen_id')
     can_view_details = True
@@ -364,7 +364,7 @@ class Allspecies(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('species_id', True)
+    column_default_sort = ('species_id', False)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['species_id', 'species_name']
     column_filters = ['species_id', 'species_name']
@@ -391,7 +391,7 @@ class Allspecimen(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('specimen_id', True)
+    column_default_sort = ('specimen_id', False)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['specimen_id', 'specimen_name']
     column_filters = ['specimen_id', 'specimen_name']
@@ -423,7 +423,7 @@ class analyticalTest(MyModelView):
                       'test_outcome_created_by', 'test_outcome_created_date', 'status']
     column_editable_list = ['test_name', 'sample_id', 'outcome_result',
                             'test_outcome_created_by', 'test_outcome_created_date', 'status']
-    can_create = False
+    can_create = True
     can_edit = True
     column_list = ('test_id','test_name','sample_id','outcome_result','test_outcome_created_by','test_outcome_created_date','status')
     can_view_details = True
@@ -443,7 +443,7 @@ class ourEmployee(MyModelView):
         return False
 
     column_display_pk = True
-    column_default_sort = ('id', True)
+    column_default_sort = ('id', False)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['id', 'emp_id', 'emp_name', 'password', 'designation',
                               'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
@@ -451,7 +451,7 @@ class ourEmployee(MyModelView):
                       'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
     column_editable_list = [ 'emp_id', 'emp_name', 'password', 'designation',
                             'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
-    can_create = False
+    can_create = True
     can_edit = True
     column_list = ('id','emp_id','emp_name','password','designation','status','email_id','phone_no','address','location','usercode')
     can_view_details = True
@@ -479,6 +479,58 @@ class invoices(MyModelView):
     can_create = False
     can_edit = True
     column_list = ('invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    can_export = True
+    
+    
+# 11
+class locationViews(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    column_display_pk = True
+    column_default_sort = ('location_id', False)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['location_id', 'location_name', 'sflag', 'iflag']
+    column_filters = ['location_id', 'location_name', 'sflag', 'iflag']
+    column_editable_list = ['location_name', 'sflag', 'iflag']
+    can_create = True
+    can_edit = True
+    column_list = ('location_id','location_name','sflag','iflag')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    can_export = True
+    
+    
+# 12
+class clinicalTestViews(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    column_display_pk = True
+    column_default_sort = ('clinicalTest_id',  False)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['clinicalTest_id', 'clinicalTest_name']
+    column_filters = ['clinicalTest_id', 'clinicalTest_name']
+    column_editable_list = [ 'clinicalTest_name']
+    can_create = True
+    can_edit = True
+    column_list = ('clinicalTest_id', 'clinicalTest_name')
     can_view_details = True
     page_size = 50
     create_modal = True

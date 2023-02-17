@@ -7,8 +7,8 @@ from flask_admin.contrib.sqla import ModelView
 from flask import Flask, request
 from sqlalchemy import ForeignKey
 from model_views import (
-    testAdminView, MyModelView, usernameview, testView1, samplep, invoice, report, invoiceDetails, paymentHistory,
-    pickupDetails, receiveDetails, sampleStock, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices
+    testAdminView, MyModelView, usernameview, testView1, samplep, invoice, report, invoiceDetails, paymentHistory,pickupDetails,
+    receiveDetails, sampleStock, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
 )
 import forms
 import os
@@ -142,6 +142,14 @@ class pickup_details(db.Model):
         return self.sample_id
     
 
+class location(db.Model):
+    location_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    location_name = db.Column(db.String(500), nullable=True)
+    sflag = db.Column(db.Integer, nullable=True)
+    iflag = db.Column(db.Integer, nullable=True)
+
+
 class receive_details(db.Model):
     receive_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
@@ -205,6 +213,13 @@ class sample_stock(db.Model):
     def __str__(self):
         return self.sample_code
     
+
+class clinicalTest(db.Model):
+    clinicalTest_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    clinicalTest_name = db.Column(db.String(500), nullable=True)
+
+
 
 class species(db.Model):
     species_id = db.Column(
@@ -322,8 +337,50 @@ class testUserView(BaseView):
             data = request.form
             print(data)
             generate_id(data)
-        return self.render('admin/usertest.html')
+        # return self.render('admin/usertest.html')
+        speciesData = get_species_table_data()
+        specimenData = get_specimen_table_data()
+        locationData=get_location_table_data()
+        clinicalTestData = get_clinicalTest_table_data()
+        return self.render('admin/usertest.html', speciesData=speciesData, specimenData=specimenData, locationData=locationData, clinicalTestData=clinicalTestData, admin_base_template=admin.base_template)
     
+
+def get_species_table_data():
+    speciess = db.session.query(species).all()
+    data = []
+    for spe in speciess:
+        row = [spe.species_id, spe.species_name]
+        data.append(row)
+    return data
+
+def get_specimen_table_data():
+    specimens = db.session.query(specimen).all()
+    data = []
+    for spe in specimens:
+        row = [spe.specimen_id, spe.specimen_name]
+        data.append(row)
+    return data
+
+
+def get_location_table_data():
+    locations = db.session.query(location).all()
+    data = []
+    for spe in locations:
+        row = [spe.location_id, spe.location_name]
+        data.append(row)
+    return data
+
+
+def get_clinicalTest_table_data():
+    clinicalTests = db.session.query(clinicalTest).all()
+    data = []
+    for spe in clinicalTests:
+        row = [spe.clinicalTest_name]
+        data.append(row)
+    return data
+
+
+
 
 def process_data(data, testId):
     # do something with the data
@@ -446,7 +503,11 @@ admin.add_view(analyticalTest(analytical_test, db.session,
 admin.add_view(Allspecies(species, db.session, name="Species",
                category="Functionality"))
 admin.add_view(Allspecimen(specimen, db.session,
-               name="specimen", category="Functionality"))
+               name="Specimen", category="Functionality"))
+admin.add_view(locationViews(location, db.session,
+               name="Location", category="Functionality"))
+admin.add_view(clinicalTestViews(clinicalTest, db.session,
+               name="Clinical Tests", category="Functionality"))
 
 # admins and employees
 admin.add_view(ourEmployee(employee, db.session,
