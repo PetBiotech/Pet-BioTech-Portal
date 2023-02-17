@@ -1,10 +1,11 @@
+import json
 from wtforms import SelectField
 from flask_wtf import FlaskForm
 import string
 import random
 from flask_admin.contrib.sqla import ModelView
 #from flask_restful import Api, Resource
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from sqlalchemy import ForeignKey
 from model_views import (
     testAdminView, MyModelView, usernameview, testView1, samplep, invoice, report, invoiceDetails, paymentHistory,pickupDetails,
@@ -330,19 +331,21 @@ class testUserView(BaseView):
         if current_user.has_role('superuser') or current_user.has_role('user'):
             return True
         return False
-
+    
     @expose('/', methods=['GET', 'POST'])
     def index(self):
         if request.method == 'POST':
             data = request.form
             print(data)
             generate_id(data)
+            return jsonify({'success': True})
         # return self.render('admin/usertest.html')
         speciesData = get_species_table_data()
         specimenData = get_specimen_table_data()
         locationData=get_location_table_data()
         clinicalTestData = get_clinicalTest_table_data()
-        return self.render('admin/usertest.html', speciesData=speciesData, specimenData=specimenData, locationData=locationData, clinicalTestData=clinicalTestData, admin_base_template=admin.base_template)
+        clinicalTestDatas = json.dumps(clinicalTestData)
+        return self.render('admin/usertest.html', speciesData=speciesData, specimenData=specimenData, locationData=locationData, clinicalTestData=clinicalTestDatas, admin_base_template=admin.base_template)
     
 
 def get_species_table_data():
@@ -380,15 +383,81 @@ def get_clinicalTest_table_data():
     return data
 
 
-
+def generate_id(data):
+    id = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+    process_data(data, id)
+    return
 
 def process_data(data, testId):
     # do something with the data
+    defaultDate='0001-01-01 00:00:01'
+    defaultTime='00:00:01'
+    defaultStatus=0
     try:
-        # checkTestId = test.query.filter_by(id=testId).first()
-        # if (checkTestId != None):
-        #     generate_id(data)
-        # desc = data['address']
+        checkTestId = sample_stock.query.filter_by(sample_code=testId).first()
+        if (checkTestId != None):
+            generate_id(data)
+        # 
+        # 
+        # Backend information
+        # 
+        # 
+        sample_code = testId
+        created_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(created_date)
+        created_by = current_user.username
+        created_time='00:00:01'
+        print(created_by)
+        #
+        #
+        # Owner and Pet details
+        #
+        #
+        sample_name = data['clinicname']
+        sample_description = data['clinicBackground']
+        # outcome_remarks = sum of details, like age, canine, owner
+        no_of_test = data['no_of_test']
+        customer_name = data['username']
+        breed = data['breed']
+        gender = data['gender']
+        age = data['age']
+        # 
+        # 
+        # Address details
+        # 
+        # 
+        state=data['state']
+        city=data['city']
+        address=data['address']
+        pincode=data['pincode']
+        phno=data['phno']
+        mobileno=phno
+        email=data['email']
+        # 
+        # 
+        # Test Details
+        # 
+        # 
+        species = data['species']
+        sample = data['sample']
+        tests = request.form.getlist('test')
+        print(tests)
+        return
+    except:
+        return render_template('admin/usertest.html')
+
+
+# --------------------------------
+# CREATE FLASK ADMIN
+# --------------------------------
+admin = flask_admin.Admin(
+    app,
+    '',
+    base_template='my_master.html',
+    template_mode='bootstrap3',
+)
+
+# desc = data['address']
         # current_time = datetime.now()
         # clinic = data['clinicname']
         # loaction = data['state']
@@ -409,31 +478,6 @@ def process_data(data, testId):
         # paymentDb = testPayment(Testid=testId, Owner=owner,Clinic_ReferralName=clinic,Mobile=mobile)
         # db.session.add(paymentDb)
         # db.session.commit()
-        return
-    except:
-        return render_template('admin/usertest.html')
-
-
-def generate_id(data):
-    id = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-    process_data(data, id)
-    return
-
-
-# --------------------------------
-# CREATE FLASK ADMIN
-# --------------------------------
-admin = flask_admin.Admin(
-    app,
-    '',
-    base_template='my_master.html',
-    template_mode='bootstrap3',
-)
-
-# visible only for admin
-admin.add_view(MyModelView(Profile, db.session))
-admin.add_view(usernameview(Username, db.session))
-
 # visible for users and admin
 
 # manage sample tab
@@ -453,25 +497,10 @@ admin.add_view(usernameview(Username, db.session))
 # # Report tab
 # admin.add_view(report(name="Report1", category="Report"))
 
-
-#
-#
-#
-#
-
-
-##
-##
-# def generate_id(data):
-##    id = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
-##    process_data(data, id)
-# return
-###
-#
-#
-#
-#
 ###########################################Admin vies for the database table#######################################################
+# visible only for admin
+admin.add_view(MyModelView(Profile, db.session))
+admin.add_view(usernameview(Username, db.session))
 
 # orders
 admin.add_view(testUserView(name="Create Order",

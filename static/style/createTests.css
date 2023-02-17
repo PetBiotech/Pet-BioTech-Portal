@@ -28,14 +28,18 @@ select{
     width: fit-content;
     box-shadow: rgba(200, 229, 255, 0.203) 6px 2px 16px 0px,
         rgba(136, 165, 191, 0.39) -3px -2px 16px 0px;
+    max-width: 36%;
 }
-.middleForm{
-    max-width: 25%;
+.middleForm {
+    max-width: 27%;
 }
-@media screen and (max-width:660px) {
+
+@media screen and (max-width:1000px) {
+    .formDiv{
+        max-width: 50%;
+    }
     .middleForm {
-        min-width: 60%;
-        max-width: 90%;
+        max-width: 40%;
     }
 }
 
@@ -99,4 +103,19 @@ select{
 }
 .testBlock .miniTestBlock .selectTest{
     min-width: 65%;
+}
+
+/* modal design */
+.modal{
+    cursor: context-menu
+}
+.modal-header{
+    background-color: #ff5e5e;
+    color:#f4f4f4;
+}
+.modalSuccess{
+    background-color: #33a100;
+}
+.modal-header h5{
+    font-weight: bolder;
 }

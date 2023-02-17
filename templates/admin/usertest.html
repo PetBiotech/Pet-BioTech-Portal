@@ -1,7 +1,7 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 <link rel="stylesheet" href="{{ url_for('static',filename='style/createTests.css') }}">
-<form method="POST" class="form-horizontal createTestForm" id="createTestForm">
+<form method="POST" class="form-horizontal createTestForm" id="createTestForm" autocomplete="off">
   <div class="leftForm formDiv">
     <div class="form-group">
       <div class="col-xs-8">
@@ -20,14 +20,14 @@
     <div class="form-group">
       <label for="clinicname" class="control-label col-xs-4">Sample Name</label>
       <div class="col-xs-8">
-        <input id="clinicname" name="clinicname" placeholder="Clinic/Referral Name" type="text" class="form-control">
+        <input id="clinicname" name="clinicname" placeholder="Sample name/pet name" type="text" class="form-control">
       </div>
     </div>
     <div class="form-group">
-      <label for="clinicBackground" class="control-label col-xs-4">Clinical Background</label>
+      <label for="clinicBackground" class="control-label col-xs-4">Sample Description</label>
       <div class="col-xs-8">
-        <textarea id="clinicBackground" name="clinicBackground" placeholder="Clinical Background/Remarks"
-          class="form-control" style="min-height: 150px;"></textarea>
+        <textarea id="clinicBackground" name="clinicBackground" placeholder="Sample Description" class="form-control"
+          style="min-height: 150px;"></textarea>
       </div>
     </div>
     <!-- <div class="form-group">
@@ -45,7 +45,7 @@
     <div class="form-group" style="display: flex;justify-content: center;align-items: flex-start;">
       <label class="control-label col-xs-4">Gender</label>
       <div class="col-xs-8" style="cursor: pointer;">
-        <input type="radio" name="gender" value="Male" id="male" style="margin-right: 5px;"><label for="male"
+        <input type="radio" name="gender" value="Male" id="male" style="margin-right: 5px;" checked><label for="male"
           style="cursor: pointer;">Male</label>
         <br><input type="radio" name="gender" value="Female" id="female" style="margin-right: 5px;"><label for="female"
           style="cursor: pointer;">Female</label>
@@ -80,8 +80,8 @@
   <div class="middleForm formDiv">
     <!-- species -->
     <div class="form-group">
-      <label for="species" class="control-label col-xs-3">Species</label>
-      <div class="col-xs-9">
+      <p class="col-xs-12" style="font-weight: bolder;">Species</p>
+      <div class="col-xs-12">
         <select id="species" name="species" required="required" class="select form-control">
           {% for row in speciesData %}
           <option value="{{ row[0] }}">{{ row[1] }}</option>
@@ -108,7 +108,7 @@
 
      -->
     <!-- tests -->
-    <div class="form-group">
+    <div class="form-group" id="testBlockBody">
       <p class="col-xs-12" style="font-weight: bolder;">Tests</p>
       <div class="col-xs-8 testBlock" id="testBlock">
         <!-- the tests -->
@@ -219,63 +219,144 @@
     </div>
     <div class="form-group" style="display: flex;margin-top: 25px;">
       <div class="col-xs-offset-4 col-xs-4">
-        <button name="submit" id="submit-btn" type="submit" class="btn btn-primary"
-          onclick="onSubmitForm()">Create</button>
+        <button name="submit" id="submit-btn" type="submit" class="btn btn-primary">Create</button>
       </div>
       <div class="col-xs-offset-0 col-xs-4">
-        <button name="reset" type="reset" class="btn btn-danger">Reset</button>
+        <button id="resetBtn" name="reset" type="reset" class="btn btn-danger">Reset</button>
       </div>
     </div>
   </div>
 </form>
+
+
+<!-- modal -->
+<div class="modal fade" id="EmptyTestErrorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Alert</h5>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modal for form submission -->
+<div class="modal fade" id="formSubmittedModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Message</h5>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="closeFormModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static',filename='script/createTest.js') }}"></script>
 <script type="text/javascript">
   let numTests = 0; // keep track of the number of tests added
+  addTest();
 
   function addTest() {
-  numTests++; // increment the test counter
-  const miniTestBlock = document.createElement("div");
-  miniTestBlock.classList.add("miniTestBlock");
-  miniTestBlock.id = "miniTestBlock" + numTests;
+    numTests++; // increment the test counter
+    const miniTestBlock = document.createElement("div");
+    miniTestBlock.classList.add("miniTestBlock");
+    miniTestBlock.id = "miniTestBlock" + numTests;
 
-  const testTitle = document.createElement("p");
-  testTitle.classList.add("testTitle");
-  testTitle.id = "testTitle" + numTests;
-  testTitle.innerText = "Test " + numTests;
-  
-  const selectTest = document.createElement("select");
-  selectTest.classList.add("col-xs-8", "form-control", "selectTest");
-  selectTest.id = "selectTest" + numTests;
-//write for loop to add first 5 numbers
+    const testTitle = document.createElement("p");
+    testTitle.classList.add("testTitle");
+    testTitle.id = "testTitle" + numTests;
+    testTitle.innerText = "Test " + numTests;
+
+    const selectTest = document.createElement("select");
+    selectTest.classList.add("col-xs-8", "form-control", "selectTest");
+    selectTest.id = "selectTest" + numTests;
+    selectTest.name = "selectTest" + numTests;
+
+    let testData = JSON.parse('{{ clinicalTestData|safe }}');
+    testData.forEach((test, index) => {
+      const option = document.createElement("option");
+      option.classList.add("optionTest");
+      option.id = `optionTest${index+1}`;
+      option.innerText = test;
+      option.value = test;
+      selectTest.appendChild(option);
+    });
+
+    const cross = document.createElement("div");
+    cross.classList.add("cross");
+    cross.id = "cross" + numTests;
+    cross.innerText = "X";
+
+    cross.addEventListener("click", () => {
+      let selects = document.getElementsByClassName('selectTest');
+      if (selects.length == 1) {
+        $('#EmptyTestErrorModal .modal-body').text('Atleast one Test is required');
+        $('#EmptyTestErrorModal').modal('show');
+      } else {
+        miniTestBlock.remove();
+      }
+    });
+
+    miniTestBlock.appendChild(testTitle);
+    miniTestBlock.appendChild(selectTest);
+    miniTestBlock.appendChild(cross);
+
+    document.getElementById('testBlock').appendChild(miniTestBlock);
+  }
 
 
-// let testData = "{{ clinicalTestData }}"; //'[[&#39;A&#39;], [&#39;s&#39;], [&#39;ggg&#39;]]';
-{% for test in clinicalTestData %}
-const option{{ loop.index }} = document.createElement("option");
-option{{ loop.index }}.classList.add("optionTest");
-option{{ loop.index }}.id = "optionTest{{ loop.index }}";
-option{{ loop.index }}.innerText = "{{ test.test_name }}";
-option{{ loop.index }}.value = "{{ test.test_id }}";
 
-selectTest.appendChild(option{{ loop.index }});
-{% endfor %}
+  function closeModal() {
+    $('#EmptyTestErrorModal').modal('hide');
+  }
+
+  function closeFormModal() {
+    $('#formSubmittedModal').modal('hide');
+  }
 
 
-  const cross = document.createElement("div");
-  cross.classList.add("cross");
-  cross.id = "cross" + numTests;
-  cross.innerText = "X";
-
-  cross.addEventListener("click", () => {
-  miniTestBlock.remove();
+  $(document).ready(function () {
+    $('#createTestForm').submit(function (e) {
+      e.preventDefault();
+      var form_data = $(this).serialize();
+      $.ajax({
+        type: 'POST',
+        url: '',
+        data: form_data,
+        success: function (response) {
+          // handle the response
+          if (response) {
+            // if the response is successful, do something
+            $('#formSubmittedModal .modal-header').addClass('modalSuccess')
+            $('#formSubmittedModal .modal-body').text('Form Submitted Successfully!');
+            $('#formSubmittedModal').modal('show');
+            document.getElementById("resetBtn").click();
+            $('#testBlock').html(response);
+            numTests=0;
+            addTest();
+            window.history.replaceState({}, '', window.location.href);
+          } else {
+            // if the response is not successful, do something
+            $('#formSubmittedModal .modal-header').removeClass('modalSuccess')
+            $('#formSubmittedModal .modal-body').text('Form Submission Failed!');
+            $('#formSubmittedModal').modal('show');
+          }
+        },
+        error: function () {
+          // handle any errors that occur during the AJAX request
+          $('#formSubmittedModal .modal-header').removeClass('modalSuccess')
+          $('#formSubmittedModal .modal-body').text('An error occurred while submitting the form.');
+          $('#formSubmittedModal').modal('show');
+        }
+      });
+    });
   });
-
-  miniTestBlock.appendChild(testTitle);
-  miniTestBlock.appendChild(selectTest);
-  miniTestBlock.appendChild(cross);
-
-  document.getElementById('testBlock').appendChild(miniTestBlock);
-}
 </script>
 {% endblock body %}
