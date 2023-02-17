@@ -13,8 +13,13 @@
 //         table.querySelectorAll("th, td")[i].style.width = `${maxWidth}px`;
 //     }
 // }
-
-// const tables = document.querySelectorAll(".model-list");
-// tables.forEach((table) => {
-//     adjustColumnWidths(table);
-// });
+window.onload = function () {
+    let xyz = document.querySelectorAll('.model-list > tbody > tr > .col-outcome_result > a');
+    xyz.forEach((result) => {
+        if (result.textContent == 'Positive' || result.textContent == 'positive' || result.textContent == 'Pos' || result.textContent == 'pos' || result.textContent == '+' || result.textContent == '+ve') {
+            result.style.backgroundColor = "red";
+            result.style.color = "white";
+            result.style.padding = "10px 25px";
+        }
+    })
+}

@@ -277,7 +277,8 @@
     const selectTest = document.createElement("select");
     selectTest.classList.add("col-xs-8", "form-control", "selectTest");
     selectTest.id = "selectTest" + numTests;
-    selectTest.name = "selectTest" + numTests;
+    // selectTest.name = "selectTest" + numTests;
+    selectTest.name = "selectTest";
 
     let testData = JSON.parse('{{ clinicalTestData|safe }}');
     testData.forEach((test, index) => {

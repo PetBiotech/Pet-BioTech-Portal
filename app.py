@@ -4,11 +4,11 @@ from flask_wtf import FlaskForm
 import string
 import random
 from flask_admin.contrib.sqla import ModelView
-#from flask_restful import Api, Resource
+# from flask_restful import Api, Resource
 from flask import Flask, jsonify, request
 from sqlalchemy import ForeignKey
 from model_views import (
-    testAdminView, MyModelView, usernameview, testView1, samplep, invoice, report, invoiceDetails, paymentHistory,pickupDetails,
+    testAdminView, MyModelView, usernameview, testView1, samplep, invoice, report, invoiceDetails, paymentHistory, pickupDetails,
     receiveDetails, sampleStock, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
 )
 import forms
@@ -98,7 +98,8 @@ security = Security(app, user_datastore,
 
 
 class invoice_details(db.Model):
-    invoice_details_id = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    invoice_details_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
     invoice_id = db.Column(db.Integer, nullable=True)
     test_name = db.Column(db.String(200), nullable=True)
     amount = db.Column(db.Integer, nullable=True)
@@ -111,24 +112,25 @@ class invoice_details(db.Model):
 
     def __str__(self):
         return self.invoice_id
-    
-    
+
+
 class payment_history(db.Model):
     payment_history_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
     invoice_id = db.Column(db.Integer, nullable=True)
     payment_mode = db.Column(db.String(200), nullable=True)
     total_amount = db.Column(db.Integer, nullable=True)
-    paid_amount=db.Column(db.Integer, nullable=True)
+    paid_amount = db.Column(db.Integer, nullable=True)
     balance_amt = db.Column(db.Integer, nullable=True)
     status = db.Column(db.Integer, nullable=True)
     payment_collected_by = db.Column(db.String(100), nullable=True)
     payment_collected_date = db.Column(db.DateTime(timezone=True),
                                        default=datetime.utcnow, nullable=True)
+
     def __str__(self):
         return self.payment_mode
-    
-    
+
+
 class pickup_details(db.Model):
     pickup_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
@@ -141,7 +143,7 @@ class pickup_details(db.Model):
 
     def __str__(self):
         return self.sample_id
-    
+
 
 class location(db.Model):
     location_id = db.Column(
@@ -159,7 +161,7 @@ class receive_details(db.Model):
     received_date = db.Column(db.DateTime(timezone=True),
                               default=datetime.utcnow, nullable=True)
     remarks = db.Column(db.String(500), nullable=True)
-    created_by=db.Column(db.String(100), nullable=True)
+    created_by = db.Column(db.String(100), nullable=True)
     vet_remarks = db.Column(db.String(500), nullable=True)
     vetremarks_updated_by = db.Column(db.String(100), nullable=True)
     vetremarks_updated_date = db.Column(db.DateTime(timezone=True),
@@ -167,35 +169,35 @@ class receive_details(db.Model):
 
     def __str__(self):
         return self.receive_id
-    
-    
+
+
 class sample_stock(db.Model):
     sample_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
     sample_code = db.Column(db.String(20), nullable=True)
-    sample_name=db.Column(db.String(100), nullable=True)
+    sample_name = db.Column(db.String(100), nullable=True)
     sample_description = db.Column(db.String(1000), nullable=True)
     outcome_remarks = db.Column(db.String(1000), nullable=True)
     noof_samples = db.Column(db.Integer, nullable=True)
     customer_name = db.Column(db.String(100), nullable=True)
     address = db.Column(db.String(1000), nullable=True)
-    mobile_no=db.Column(db.Integer, nullable=True)
-    phone_no=db.Column(db.Integer, nullable=True)
-    email_id=db.Column(db.String(100), nullable=True)
+    mobile_no = db.Column(db.Integer, nullable=True)
+    phone_no = db.Column(db.Integer, nullable=True)
+    email_id = db.Column(db.String(100), nullable=True)
     created_by = db.Column(db.String(100), nullable=True)
     created_time = db.Column(db.Time(timezone=True),
                              default=datetime.utcnow, nullable=True)
-    counciler_status=db.Column(db.Integer, nullable=True)
-    customer_status=db.Column(db.Integer, nullable=True)
+    counciler_status = db.Column(db.Integer, nullable=True)
+    customer_status = db.Column(db.Integer, nullable=True)
     pickup_status = db.Column(db.Integer, nullable=True)
     created_date = db.Column(db.DateTime(timezone=True),
                              default=datetime.utcnow, nullable=True)
-    total_sample_price=db.Column(db.Integer, nullable=True)
+    total_sample_price = db.Column(db.Integer, nullable=True)
     price_unit = db.Column(db.Integer, nullable=True)
     customer_accepted_by = db.Column(db.String(100), nullable=True)
     customer_accepted_date = db.Column(db.DateTime(timezone=True),
                                        default=datetime.utcnow, nullable=True)
-    result_upload_status=db.Column(db.Integer, nullable=True)
+    result_upload_status = db.Column(db.Integer, nullable=True)
     pickup_accepted_status = db.Column(db.Integer, nullable=True)
     receive_accepted_status = db.Column(db.Integer, nullable=True)
     invoice_status = db.Column(db.Integer, nullable=True)
@@ -203,23 +205,22 @@ class sample_stock(db.Model):
     updated_date = db.Column(db.DateTime(timezone=True),
                              default=datetime.utcnow, nullable=True)
     age = db.Column(db.Integer, nullable=True)
-    gender=db.Column(db.String(25), nullable=True)
+    gender = db.Column(db.String(25), nullable=True)
     pincode = db.Column(db.Integer, nullable=True)
     location_id = db.Column(db.Integer, nullable=True)
-    bread=db.Column(db.String(100), nullable=True)
+    bread = db.Column(db.String(100), nullable=True)
     # gender = db.Column(db.String(100), nullable=True)
     species_id = db.Column(db.Integer, nullable=True)
     specimen_id = db.Column(db.Integer, nullable=True)
 
     def __str__(self):
         return self.sample_code
-    
+
 
 class clinicalTest(db.Model):
     clinicalTest_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
     clinicalTest_name = db.Column(db.String(500), nullable=True)
-
 
 
 class species(db.Model):
@@ -229,8 +230,8 @@ class species(db.Model):
 
     def __str__(self):
         return self.species_id
-    
-    
+
+
 class specimen(db.Model):
     specimen_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
@@ -243,6 +244,8 @@ class specimen(db.Model):
 class AnalyticalTestForm(FlaskForm):
     outcome_result = SelectField('Outcome Result', choices=[(
         'positive', 'Positive'), ('negative', 'Negative')])
+
+
 class analytical_test(db.Model):
     test_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     test_name = db.Column(db.String(200), nullable=True)
@@ -251,7 +254,7 @@ class analytical_test(db.Model):
     test_outcome_created_by = db.Column(db.String(100), nullable=True)
     test_outcome_created_date = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.Integer, nullable=True)
-    
+
 
 class employee(db.Model):
     id = db.Column(
@@ -269,8 +272,8 @@ class employee(db.Model):
 
     def __str__(self):
         return self.emp_id
-    
-    
+
+
 class invoice(db.Model):
     invoice_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
@@ -293,20 +296,15 @@ class invoice(db.Model):
 
     def __str__(self):
         return self.grand_total
-    
-    
+
+
 # class sqlite_sequence(db.Model):
 #     name = db.Column(db.String(500))
 #     seq = db.Column(db.Integer)
 
 #     def __str__(self):
 #         return self.name
-    
-    
-    
-    
-    
-    
+
 
 # --------------------------------
 # MODEL VIEW CLASSES
@@ -331,22 +329,22 @@ class testUserView(BaseView):
         if current_user.has_role('superuser') or current_user.has_role('user'):
             return True
         return False
-    
+
     @expose('/', methods=['GET', 'POST'])
     def index(self):
         if request.method == 'POST':
             data = request.form
-            print(data)
+            # print(data)
             generate_id(data)
             return jsonify({'success': True})
         # return self.render('admin/usertest.html')
         speciesData = get_species_table_data()
         specimenData = get_specimen_table_data()
-        locationData=get_location_table_data()
+        locationData = get_location_table_data()
         clinicalTestData = get_clinicalTest_table_data()
         clinicalTestDatas = json.dumps(clinicalTestData)
         return self.render('admin/usertest.html', speciesData=speciesData, specimenData=specimenData, locationData=locationData, clinicalTestData=clinicalTestDatas, admin_base_template=admin.base_template)
-    
+
 
 def get_species_table_data():
     speciess = db.session.query(species).all()
@@ -355,6 +353,7 @@ def get_species_table_data():
         row = [spe.species_id, spe.species_name]
         data.append(row)
     return data
+
 
 def get_specimen_table_data():
     specimens = db.session.query(specimen).all()
@@ -388,26 +387,32 @@ def generate_id(data):
     process_data(data, id)
     return
 
+
 def process_data(data, testId):
     # do something with the data
-    defaultDate='0001-01-01 00:00:01'
-    defaultTime='00:00:01'
-    defaultStatus=0
+    c_date = '0001-01-01 00:00:01'
+    defaultDate = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
+    defaultStatus = 0
     try:
         checkTestId = sample_stock.query.filter_by(sample_code=testId).first()
         if (checkTestId != None):
             generate_id(data)
-        # 
-        # 
+        #
+        #
         # Backend information
-        # 
-        # 
+        #
+        #
         sample_code = testId
-        created_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(created_date)
+        c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        created_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
         created_by = current_user.username
-        created_time='00:00:01'
-        print(created_by)
+        # time_str = '00:00:01'
+        time_str = datetime.now()
+        new_time_str = time_str.strftime('%H:%M:%S')
+        created_time = datetime.strptime(new_time_str, '%H:%M:%S').time()
+        # print("***********************")
+        # print(created_time)
+        # print(created_date)
         #
         #
         # Owner and Pet details
@@ -415,33 +420,56 @@ def process_data(data, testId):
         #
         sample_name = data['clinicname']
         sample_description = data['clinicBackground']
-        # outcome_remarks = sum of details, like age, canine, owner
         no_of_test = data['no_of_test']
         customer_name = data['username']
         breed = data['breed']
         gender = data['gender']
         age = data['age']
-        # 
-        # 
+        #
+        #
         # Address details
-        # 
-        # 
-        state=data['state']
-        city=data['city']
-        address=data['address']
-        pincode=data['pincode']
-        phno=data['phno']
-        mobileno=phno
-        email=data['email']
-        # 
-        # 
+        #
+        #
+        state = data['state']
+        city = data['city']
+        address = data['address']
+        pincode = data['pincode']
+        phno = data['phno']
+        mobileno = phno
+        email = data['email']
+        address += "\n"+city+" - "+pincode+"\n"+state
+        #
+        #
         # Test Details
-        # 
-        # 
+        #
+        #
         species = data['species']
         sample = data['sample']
-        tests = request.form.getlist('test')
-        print(tests)
+        tests = request.form.getlist('selectTest')
+        outcome_remarks = ''
+        i=1
+        for test in tests:
+            index=str(i)
+            outcome_remarks += index + "."+test+'\n'
+            i+=1
+        #
+        #
+        # Creation of Id's
+        #
+        #
+        sample_id = sample_stock.query.order_by(
+            sample_stock.sample_id.desc()).first().sample_id+1
+        invoice_id = invoice.query.order_by(
+            invoice.invoice_id.desc()).first().invoice_id+1
+        #
+        #
+        # Storing in Database
+        #
+        #
+        sampleStockDb = sample_stock(sample_id=sample_id, sample_code=sample_code, sample_name=sample_name, sample_description=sample_description, outcome_remarks=outcome_remarks, noof_samples=no_of_test, customer_name=customer_name, address=address, mobile_no=mobileno, phone_no=phno, email_id=email, created_by=created_by, created_time=created_time, counciler_status=defaultStatus, customer_status=defaultStatus,
+                                     pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, bread=breed, species_id=species, specimen_id=sample)
+        db.session.add(sampleStockDb)
+        db.session.commit()
         return
     except:
         return render_template('admin/usertest.html')
@@ -458,26 +486,26 @@ admin = flask_admin.Admin(
 )
 
 # desc = data['address']
-        # current_time = datetime.now()
-        # clinic = data['clinicname']
-        # loaction = data['state']
-        # breed = data['breed']
-        # sample = data['sample']
-        # species = data['species']
-        # age = data['age']
-        # owner = data['username']
-        # mobile = data['phno']
-        # tests = data['testBox1']
-        # print(testId)
-        # # date=current_time,
-        # testDb = test(id=testId, desc=desc, date=current_time,
-        #               Clinic_ReferralName=clinic, Location=loaction, Breed=breed, Sample=sample, Species=species, Age=age, Owner=owner, Mobile=mobile, Tests=tests)
-        # db.session.add(testDb)
-        # db.session.commit()
-        
-        # paymentDb = testPayment(Testid=testId, Owner=owner,Clinic_ReferralName=clinic,Mobile=mobile)
-        # db.session.add(paymentDb)
-        # db.session.commit()
+# current_time = datetime.now()
+# clinic = data['clinicname']
+# loaction = data['state']
+# breed = data['breed']
+# sample = data['sample']
+# species = data['species']
+# age = data['age']
+# owner = data['username']
+# mobile = data['phno']
+# tests = data['testBox1']
+# print(testId)
+# # date=current_time,
+# testDb = test(id=testId, desc=desc, date=current_time,
+#               Clinic_ReferralName=clinic, Location=loaction, Breed=breed, Sample=sample, Species=species, Age=age, Owner=owner, Mobile=mobile, Tests=tests)
+# db.session.add(testDb)
+# db.session.commit()
+
+# paymentDb = testPayment(Testid=testId, Owner=owner,Clinic_ReferralName=clinic,Mobile=mobile)
+# db.session.add(paymentDb)
+# db.session.commit()
 # visible for users and admin
 
 # manage sample tab
@@ -497,7 +525,7 @@ admin = flask_admin.Admin(
 # # Report tab
 # admin.add_view(report(name="Report1", category="Report"))
 
-###########################################Admin vies for the database table#######################################################
+########################################### Admin vies for the database table#######################################################
 # visible only for admin
 admin.add_view(MyModelView(Profile, db.session))
 admin.add_view(usernameview(Username, db.session))
@@ -541,32 +569,6 @@ admin.add_view(clinicalTestViews(clinicalTest, db.session,
 # admins and employees
 admin.add_view(ourEmployee(employee, db.session,
                name="Employees"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ##################################################################################################
@@ -641,7 +643,7 @@ def build_sample_db():
 if __name__ == '__main__':
     # Delete the row with the specified primary key
     # db.add(test)
-# Commit the changes
+    # Commit the changes
     # db.session.commit()
     # db.drop_all()
     # Build a sample db on the fly, if one does not exist yet.

@@ -146,6 +146,7 @@ body {
         rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
     border-radius: 10px;
 }
+
 .table-responsive thead {
     background-color: #00154f;
 }
@@ -153,15 +154,18 @@ body {
 .table-responsive thead tr th a {
     color: white;
 }
+
 .table-hover {
     background-color: #f4f4f4;
     width: 75%;
     margin: auto;
     padding: 15px 25px;
 }
-.model-list{
+
+.model-list {
     width: 100%;
 }
+
 .model-list>thead>tr>th {
     vertical-align: middle;
     text-align: center;
@@ -184,38 +188,42 @@ body {
 .model-list tr td:first-child {
     min-width: 50px;
 }
-.model-list tr td{
-    min-width: auto;
-    max-width: 150px;
-    /* white-space: nowrap; */
-    overflow: hidden;
-    text-overflow: ellipsis;
+.model-list>thead>tr>.col-outcome_remarks {
+    min-width: 400px;
 }
-
+.model-list>tbody>tr>.col-outcome_remarks>a {
+    white-space: pre-wrap;
+}
+.model-list>thead>tr>.col-address {
+    min-width: 300px;
+}
 .model-list>tbody>tr>td {
     vertical-align: middle;
     text-align: center;
     color: rgb(0, 0, 0);
 }
-.pagination{
-    margin:auto;
+.pagination {
+    margin: auto;
     margin-top: 25px;
     margin-bottom: 100px;
 }
-#filter_form{
+
+#filter_form {
     width: 100%;
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-around;
     align-items: center;
 }
-.alert{
+
+.alert {
     width: 100%;
-    margin:0;
+    margin: 0;
 }
-.alert .close{
+
+.alert .close {
     margin-right: 50px;
-    padding:10px;
+    padding: 10px;
     font-size: 20px;
     font-weight: bolder;
     color: red;
