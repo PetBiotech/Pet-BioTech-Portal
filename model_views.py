@@ -12,7 +12,6 @@ import sqlite3
 import string
 import random
 from flask_admin.model import typefmt
-from tableFunctions import SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
 from markupsafe import Markup
 
