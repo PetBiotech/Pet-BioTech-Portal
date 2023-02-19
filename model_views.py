@@ -1,7 +1,10 @@
 import datetime
+import dbm
 import gettext
 from pyexpat import model
+import dbConnect
 from flask_admin.contrib import sqla
+from flask_admin.contrib.sqla import ModelView
 from flask_security import current_user
 from flask import Flask, abort, redirect, render_template, url_for, request
 from flask_admin import BaseView, expose
@@ -9,14 +12,16 @@ import sqlite3
 import string
 import random
 from flask_admin.model import typefmt
-
+from tableFunctions import SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
 from markupsafe import Markup
-# from app import generate_id,process_data
 
+
+# from app import generate_id,process_data
 # from app import generate_id
 
 app = Flask(__name__)
+db = SQLAlchemy()
 
 
 class MyModelView(sqla.ModelView):
@@ -122,7 +127,8 @@ class testAdminView(MyModelView):
         return False
     column_display_pk = True
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['id', 'Owner', 'Clinic_ReferralName', 'Mobile','Tests','Species','Location','date']
+    column_searchable_list = ['id', 'Owner', 'Clinic_ReferralName',
+                              'Mobile', 'Tests', 'Species', 'Location', 'date']
     column_filters = ['id', 'Owner', 'Clinic_ReferralName',
                       'Mobile', 'Tests', 'Species', 'Location', 'date']
     column_editable_list = ['desc']
@@ -150,7 +156,6 @@ class testView1(BaseView):
         return self.render('admin/legacysr.html')
 
 
-
 class samplep(MyModelView):
 
     def is_accessible(self):
@@ -160,7 +165,6 @@ class samplep(MyModelView):
             return True
         return False
 
-    
     column_display_pk = False
     column_default_sort = ('id', True)
     #form_columns = ['id', 'desc']
@@ -180,18 +184,18 @@ class samplep(MyModelView):
 
 # invoice section
 
-class invoice(BaseView):
+# class invoice(BaseView):
 
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
+#     def is_accessible(self):
+#         if not current_user.is_active or not current_user.is_authenticated:
+#             return False
+#         if current_user.has_role('superuser') or current_user.has_role('user'):
+#             return True
+#         return False
 
-    @expose('/')
-    def index(self):
-        return self.render('admin/invoice.html')
+#     @expose('/')
+#     def index(self):
+#         return self.render('admin/invoice.html')
 
 
 # invoice section
@@ -213,8 +217,8 @@ class report(BaseView):
     @expose('/')
     def index(self):
         return self.render('admin/hi.html')
-    
-    
+
+
 ###############################################################################################
 # 1
 class invoiceDetails(MyModelView):
@@ -236,12 +240,19 @@ class invoiceDetails(MyModelView):
     column_editable_list = ['test_name', 'amount']
     can_create = True
     can_edit = True
-    column_list = ('invoice_id','test_name','amount','created_by','created_date','updated_by','updated_date')
+    column_list = ('invoice_id', 'test_name', 'amount',
+                   'created_by', 'created_date', 'updated_by', 'updated_date')
     can_view_details = True
     page_size = 50
     create_modal = True
-    edit_modal = True
-    can_export = True
+    edit_modal = False
+    can_export = False
+
+    @property
+    def can_delete(self):
+        if (current_user.has_role('superuser')):
+            return True
+        return False
 
 
 # 2
@@ -261,18 +272,29 @@ class paymentHistory(MyModelView):
                               'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
     column_filters = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
                       'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    column_editable_list = ['payment_mode', 'total_amount', 'paid_amount',
-                            'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
+    # column_editable_list = ['payment_mode', 'total_amount', 'paid_amount',
+    #                         'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
+    column_editable_list = [
+        'payment_mode', 'status', 'payment_collected_by', 'payment_collected_date']
     can_create = False
     can_edit = True
-    column_list = ('invoice_id','payment_mode','total_amount','paid_amount','balance_amt','status','payment_collected_by','payment_collected_date')
+    column_list = ('invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
+                   'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date')
     can_view_details = True
     page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
 
+    @property
+    def can_delete(self):
+        if (current_user.has_role('superuser')):
+            return True
+        return False
+
 # 3
+
+
 class pickupDetails(MyModelView):
 
     def is_accessible(self):
@@ -289,17 +311,25 @@ class pickupDetails(MyModelView):
                               'picked_by', 'picked_date', 'remarks', 'created_by']
     column_filters = ['pickup_id', 'sample_id',
                       'picked_by', 'picked_date', 'remarks', 'created_by']
-    column_editable_list = ['picked_by', 'picked_date', 'remarks', 'created_by']
+    column_editable_list = ['picked_by', 'picked_date','remarks']
     can_create = True
     can_edit = True
-    column_list = ('pickup_id','sample_id','picked_by','picked_date','remarks','created_by')
+    column_list = ('pickup_id', 'sample_id', 'picked_by',
+                   'picked_date', 'remarks', 'created_by')
     can_view_details = True
     page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
+    @property
+    def can_delete(self):
+        if (current_user.has_role('superuser')):
+            return True
+        return False
 
 # 4
+
+
 class receiveDetails(MyModelView):
 
     def is_accessible(self):
@@ -316,17 +346,26 @@ class receiveDetails(MyModelView):
                               'remarks', 'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date']
     column_filters = ['receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',
                       'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date']
-    column_editable_list = ['remarks','vet_remarks']
+    column_editable_list = ['remarks', 'vet_remarks',
+                            'received_by', 'received_date', 'vet_remarks']
     can_create = True
     can_edit = True
-    column_list = ('receive_id','sample_id','received_by','received_date','remarks','created_by','vet_remarks','vetremarks_updated_by','vetremarks_updated_date')
+    column_list = ('receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',
+                   'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date')
     can_view_details = True
     page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
 
+    @property
+    def can_delete(self):
+        if (current_user.has_role('superuser')):
+            return True
+        return False
 # 5
+
+
 class sampleStock(MyModelView):
 
     def is_accessible(self):
@@ -339,18 +378,32 @@ class sampleStock(MyModelView):
     column_display_pk = True
     column_default_sort = ('sample_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
-    column_filters = ['sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
-    column_editable_list = ['sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','phone_no','email_id','created_by','counciler_status','customer_status','pickup_status','created_date','total_sample_price','price_unit','customer_accepted_by','customer_accepted_date','result_upload_status','pickup_accepted_status','receive_accepted_status','invoice_status','updated_by','updated_date','age','gender','pincode','location_id','bread','species_id','specimen_id']
-    can_create = True
+    column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date',
+                              'total_sample_price', 'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+    column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date', 'total_sample_price',
+                      'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+    column_editable_list = ['sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'counciler_status', 'customer_status', 'pickup_status', 'total_sample_price', 'price_unit',
+                            'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+    # can_create = True
     can_edit = True
-    column_list = ('sample_id','sample_code','sample_name','sample_description','outcome_remarks','noof_samples','customer_name','address','mobile_no','email_id','created_by','created_date','updated_by','updated_date','age','gender','pincode','bread','location_id','species_id','specimen_id')
+    column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
+                   'email_id', 'created_by', 'created_date', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
     can_view_details = True
     page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
-
+    can_delete = True
+    @property
+    def can_create(self):
+        if (current_user.has_role('superuser')):
+            return True
+        return False
+    # @property
+    # def can_delete(self):
+    #     if (current_user.has_role('superuser')):
+    #         return True
+    #     return False
 # 6
 
 
@@ -368,10 +421,10 @@ class Allspecies(MyModelView):
     #form_columns = ['id', 'desc']
     column_searchable_list = ['species_id', 'species_name']
     column_filters = ['species_id', 'species_name']
-    column_editable_list = [ 'species_name']
+    column_editable_list = ['species_name']
     can_create = True
     can_edit = True
-    column_list = ('species_id','species_name')
+    column_list = ('species_id', 'species_name')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -395,7 +448,7 @@ class Allspecimen(MyModelView):
     #form_columns = ['id', 'desc']
     column_searchable_list = ['specimen_id', 'specimen_name']
     column_filters = ['specimen_id', 'specimen_name']
-    column_editable_list = [ 'specimen_name']
+    column_editable_list = ['specimen_name']
     can_create = True
     can_edit = True
     column_list = ('specimen_id', 'specimen_name')
@@ -406,6 +459,8 @@ class Allspecimen(MyModelView):
     can_export = True
 
 # 8
+
+
 class analyticalTest(MyModelView):
 
     def is_accessible(self):
@@ -421,11 +476,10 @@ class analyticalTest(MyModelView):
     column_searchable_list = ['test_id', 'status']
     column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
                       'test_outcome_created_by', 'test_outcome_created_date', 'status']
-    column_editable_list = ['test_name', 'sample_id', 'outcome_result',
-                            'test_outcome_created_by', 'test_outcome_created_date', 'status']
+    column_editable_list = ['test_name','outcome_result','status']
     can_create = True
     can_edit = True
-    column_list = ('test_id','test_name','sample_id','outcome_result','test_outcome_created_by','test_outcome_created_date','status')
+    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result','status','test_outcome_created_by', 'test_outcome_created_date')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -433,6 +487,8 @@ class analyticalTest(MyModelView):
     can_export = True
 
 # 9
+
+
 class ourEmployee(MyModelView):
 
     def is_accessible(self):
@@ -449,11 +505,12 @@ class ourEmployee(MyModelView):
                               'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
     column_filters = ['id', 'emp_id', 'emp_name', 'password', 'designation',
                       'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
-    column_editable_list = [ 'emp_id', 'emp_name', 'password', 'designation',
+    column_editable_list = ['emp_id', 'emp_name', 'password', 'designation',
                             'status', 'email_id', 'phone_no', 'address', 'location', 'usercode']
     can_create = True
     can_edit = True
-    column_list = ('id','emp_id','emp_name','password','designation','status','email_id','phone_no','address','location','usercode')
+    column_list = ('id', 'emp_id', 'emp_name', 'password', 'designation',
+                   'status', 'email_id', 'phone_no', 'address', 'location', 'usercode')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -461,6 +518,8 @@ class ourEmployee(MyModelView):
     can_export = True
 
 # 10
+
+
 class invoices(MyModelView):
 
     def is_accessible(self):
@@ -473,19 +532,23 @@ class invoices(MyModelView):
     column_display_pk = True
     column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total']
-    column_filters = ['invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total']
-    column_editable_list = ['sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total']
+    column_searchable_list = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
+                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
+    column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
+                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
+    column_editable_list = ['total', 'gst', 'gst_amount','updated_by',
+                            'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks']
     can_create = False
     can_edit = True
-    column_list = ('invoice_id','sample_id','total','gst','gst_amount','created_by','created_date','updated_by','updated_date','paid_amount','bal_amt','status','others_amt','others_remarks','grand_total')
+    column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount','others_amt','grand_total','paid_amount','bal_amt','created_by','created_date', 'updated_by',
+                   'updated_date','status','others_remarks', 'grand_total')
     can_view_details = True
     page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
-    
-    
+
+
 # 11
 class locationViews(MyModelView):
 
@@ -504,14 +567,14 @@ class locationViews(MyModelView):
     column_editable_list = ['location_name', 'sflag', 'iflag']
     can_create = True
     can_edit = True
-    column_list = ('location_id','location_name','sflag','iflag')
+    column_list = ('location_id', 'location_name', 'sflag', 'iflag')
     can_view_details = True
     page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
-    
-    
+
+
 # 12
 class clinicalTestViews(MyModelView):
 
@@ -527,7 +590,7 @@ class clinicalTestViews(MyModelView):
     #form_columns = ['id', 'desc']
     column_searchable_list = ['clinicalTest_id', 'clinicalTest_name']
     column_filters = ['clinicalTest_id', 'clinicalTest_name']
-    column_editable_list = [ 'clinicalTest_name']
+    column_editable_list = ['clinicalTest_name']
     can_create = True
     can_edit = True
     column_list = ('clinicalTest_id', 'clinicalTest_name')

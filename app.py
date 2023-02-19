@@ -1,4 +1,5 @@
 import json
+from pymysql import NULL
 from wtforms import SelectField
 from flask_wtf import FlaskForm
 import string
@@ -6,9 +7,9 @@ import random
 from flask_admin.contrib.sqla import ModelView
 # from flask_restful import Api, Resource
 from flask import Flask, jsonify, request
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from model_views import (
-    testAdminView, MyModelView, usernameview, testView1, samplep, invoice, report, invoiceDetails, paymentHistory, pickupDetails,
+    testAdminView, MyModelView, usernameview, testView1, samplep, report, invoiceDetails, paymentHistory, pickupDetails,
     receiveDetails, sampleStock, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
 )
 import forms
@@ -24,7 +25,7 @@ from flask_security.utils import encrypt_password
 import flask_admin
 from flask_admin import BaseView, expose
 from flask_admin import helpers as admin_helpers
-from flask_admin.contrib import sqla
+# from flask_admin.contrib import sqlasql
 from datetime import datetime
 
 
@@ -49,6 +50,83 @@ user_profiles = db.Table(
     db.Column('username_id', db.Integer(), db.ForeignKey('username.id')),
     db.Column('profile_id', db.Integer(), db.ForeignKey('profile.id'))
 )
+
+
+class sampleStock(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    column_display_pk = True
+    column_default_sort = ('sample_id', True)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date',
+                              'total_sample_price', 'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+    column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date', 'total_sample_price',
+                      'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+    column_editable_list = ['sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date', 'total_sample_price',
+                            'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+    can_create = True
+    can_edit = True
+    column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
+                   'email_id', 'created_by', 'created_date', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    can_export = True
+    can_delete = True
+
+    def on_model_delete(self, model):
+        # Delete all related invoices_details
+        try:
+            find_invoice = invoice.query.filter_by(sample_id=model.sample_id).first()
+            if(find_invoice!=None):
+                find_invoice_id=find_invoice.invoice_id
+            related_invoices = db.session.query(invoice_details).filter_by(invoice_id=find_invoice_id).all()
+            for invoiceRow in related_invoices:
+                db.session.delete(invoiceRow)
+            db.session.commit()
+            # Delete all related payment data
+            related_invoices = db.session.query(payment_history).filter_by(invoice_id=find_invoice_id).all()
+            for invoiceRow in related_invoices:
+                db.session.delete(invoiceRow)
+            # Delete all related invoices
+            related_invoices = db.session.query(invoice).filter_by(sample_id=model.sample_id).all()
+            for invoiceRow in related_invoices:
+                db.session.delete(invoiceRow)
+            db.session.commit()
+            # Delete all related analytical_test
+            related_invoices = db.session.query(analytical_test).filter_by(sample_id=model.sample_id).all()
+            for invoiceRow in related_invoices:
+                db.session.delete(invoiceRow)
+            # Delete all related picked up data
+            related_invoices = db.session.query(pickup_details).filter_by(sample_id=model.sample_id).all()
+            for invoiceRow in related_invoices:
+                db.session.delete(invoiceRow)
+            # Delete all related receive data
+            related_invoices = db.session.query(
+                receive_details).filter_by(sample_id=model.sample_id).all()
+            for invoiceRow in related_invoices:
+                db.session.delete(invoiceRow)
+            db.session.commit()
+        except:
+            print("Error")
+        
+    def after_model_change(self, form, model, is_created):
+        print("after_model_change called", model)
+        if not is_created:
+            print("Data has been edited")
+        if is_created:
+            print("New Data has been added")
+
+
+
+
 
 
 class Profile(db.Model, RoleMixin):
@@ -293,7 +371,7 @@ class invoice(db.Model):
     others_amt = db.Column(db.Integer, nullable=True)
     others_remarks = db.Column(db.String(500), nullable=True)
     grand_total = db.Column(db.Integer, nullable=True)
-
+    
     def __str__(self):
         return self.grand_total
 
@@ -461,6 +539,8 @@ def process_data(data, testId):
             sample_stock.sample_id.desc()).first().sample_id+1
         invoice_id = invoice.query.order_by(
             invoice.invoice_id.desc()).first().invoice_id+1
+        test_id = analytical_test.query.order_by(
+            analytical_test.test_id.desc()).first().test_id
         #
         #
         # Storing in Database
@@ -469,6 +549,23 @@ def process_data(data, testId):
         sampleStockDb = sample_stock(sample_id=sample_id, sample_code=sample_code, sample_name=sample_name, sample_description=sample_description, outcome_remarks=outcome_remarks, noof_samples=no_of_test, customer_name=customer_name, address=address, mobile_no=mobileno, phone_no=phno, email_id=email, created_by=created_by, created_time=created_time, counciler_status=defaultStatus, customer_status=defaultStatus,
                                      pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, bread=breed, species_id=species, specimen_id=sample)
         db.session.add(sampleStockDb)
+        invoiceDb = invoice(invoice_id=invoice_id, sample_id=sample_id, total=0, gst=0, gst_amount=0, created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate, paid_amount=0, bal_amt='', status=0, others_amt='', others_remarks='', grand_total='')
+        db.session.add(invoiceDb)
+        for test in tests:
+            test_id+=1
+            invoice_detailsDb = invoice_details(invoice_id=invoice_id, test_name=test, amount=0, created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate)
+            db.session.add(invoice_detailsDb)
+            analytical_testDb = analytical_test(test_id=test_id,test_name=test, sample_id=sample_id,
+                                                outcome_result='', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
+            db.session.add(analytical_testDb)
+        pickupDb = pickup_details(sample_id=sample_id, picked_by='', picked_date=defaultDate,
+                            remarks='', created_by=created_by)
+        db.session.add(pickupDb)
+        receiveDb = receive_details(sample_id=sample_id, received_by='', received_date=defaultDate,
+                                    remarks='', created_by=created_by, vet_remarks='', vetremarks_updated_by='', vetremarks_updated_date=defaultDate)
+        db.session.add(receiveDb)
+        paymentDb = payment_history(invoice_id=invoice_id, payment_mode='', total_amount=0, paid_amount=0, balance_amt=0, status=0, payment_collected_by='', payment_collected_date=defaultDate)
+        db.session.add(paymentDb)
         db.session.commit()
         return
     except:
@@ -527,30 +624,28 @@ admin = flask_admin.Admin(
 
 ########################################### Admin vies for the database table#######################################################
 # visible only for admin
-admin.add_view(MyModelView(Profile, db.session))
-admin.add_view(usernameview(Username, db.session))
 
 # orders
 admin.add_view(testUserView(name="Create Order",
-               endpoint='usertest', category='Manage Orders'))
+               endpoint='usertest', category='Orders'))
 admin.add_view(sampleStock(sample_stock, db.session,
-               name="Show Orders", category="Manage Orders"))
+               name="Show Orders", category="Orders"))
+
+# invoice menu
+admin.add_view(invoiceDetails(invoice_details, db.session,
+               name="Create Invoice", category="Invoice"))
+admin.add_view(invoices(invoice, db.session, name="Final Invoices",
+               category="Invoice"))
 
 # payment
 admin.add_view(paymentHistory(payment_history, db.session,
                name="Payment History"))
 
-# invoice menu
-admin.add_view(invoiceDetails(invoice_details, db.session,
-               name="Invoice Details", category="Invoices"))
-admin.add_view(invoices(invoice, db.session, name="Final Invoices",
-               category="Invoices"))
-
-# pickup and remarks
+# pickup and receive
 admin.add_view(pickupDetails(pickup_details, db.session,
-               name="Pickup Details", category="Pickup / Remarks"))
+               name="Pickup Details", category="Pickup & Receive"))
 admin.add_view(receiveDetails(receive_details, db.session,
-               name="Received Details", category="Pickup / Remarks"))
+               name="Received Details", category="Pickup & Receive"))
 
 # result
 admin.add_view(analyticalTest(analytical_test, db.session,
@@ -567,8 +662,12 @@ admin.add_view(clinicalTestViews(clinicalTest, db.session,
                name="Clinical Tests", category="Functionality"))
 
 # admins and employees
+admin.add_view(MyModelView(Profile, db.session,
+               name="Profiles", category="Employees"))
+admin.add_view(usernameview(Username, db.session,
+               name="New Employees", category="Employees"))
 admin.add_view(ourEmployee(employee, db.session,
-               name="Employees"))
+               name="Old Employees", category="Employees"))
 
 
 ##################################################################################################
@@ -652,4 +751,7 @@ if __name__ == '__main__':
     ##    database_path = os.path.join(app_dir, app.config['DATABASE_FILE'])
     # if not os.path.exists(database_path):
     # build_sample_db()
+    # sql = "ALTER TABLE invoice ADD CONSTRAINT fk_invoice_sample FOREIGN KEY (sample_id) REFERENCES sample_stock(sample_id) ON DELETE CASCADE;"
+    # db.session.execute(sql)
+    # db.session.commit()
     app.run()
