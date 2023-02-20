@@ -12,7 +12,6 @@ import sqlite3
 import string
 import random
 from flask_admin.model import typefmt
-from tableFunctions import SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
 from markupsafe import Markup
 
@@ -473,7 +472,8 @@ class analyticalTest(MyModelView):
     column_display_pk = True
     column_default_sort = ('test_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['test_id', 'status']
+    column_searchable_list = ['test_id',
+                              'status', 'outcome_result', 'test_name']
     column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
                       'test_outcome_created_by', 'test_outcome_created_date', 'status']
     column_editable_list = ['test_name','outcome_result','status']
@@ -536,12 +536,11 @@ class invoices(MyModelView):
                               'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
     column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
                       'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
-    column_editable_list = ['total', 'gst', 'gst_amount','updated_by',
-                            'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks']
+    column_editable_list = ['gst', 'gst_amount', 'paid_amount','status', 'others_amt', 'others_remarks']
     can_create = False
     can_edit = True
     column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount','others_amt','grand_total','paid_amount','bal_amt','created_by','created_date', 'updated_by',
-                   'updated_date','status','others_remarks', 'grand_total')
+                   'updated_date','status','others_remarks')
     can_view_details = True
     page_size = 50
     create_modal = True

@@ -12,6 +12,7 @@ from model_views import (
     testAdminView, MyModelView, usernameview, testView1, samplep, report, invoiceDetails, paymentHistory, pickupDetails,
     receiveDetails, sampleStock, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
 )
+import pyautogui
 import forms
 import os
 from flask import (Flask, url_for, render_template,
@@ -84,28 +85,34 @@ class sampleStock(MyModelView):
     def on_model_delete(self, model):
         # Delete all related invoices_details
         try:
-            find_invoice = invoice.query.filter_by(sample_id=model.sample_id).first()
-            if(find_invoice!=None):
-                find_invoice_id=find_invoice.invoice_id
-            related_invoices = db.session.query(invoice_details).filter_by(invoice_id=find_invoice_id).all()
+            find_invoice = invoice.query.filter_by(
+                sample_id=model.sample_id).first()
+            if (find_invoice != None):
+                find_invoice_id = find_invoice.invoice_id
+            related_invoices = db.session.query(invoice_details).filter_by(
+                invoice_id=find_invoice_id).all()
             for invoiceRow in related_invoices:
                 db.session.delete(invoiceRow)
             db.session.commit()
             # Delete all related payment data
-            related_invoices = db.session.query(payment_history).filter_by(invoice_id=find_invoice_id).all()
+            related_invoices = db.session.query(payment_history).filter_by(
+                invoice_id=find_invoice_id).all()
             for invoiceRow in related_invoices:
                 db.session.delete(invoiceRow)
             # Delete all related invoices
-            related_invoices = db.session.query(invoice).filter_by(sample_id=model.sample_id).all()
+            related_invoices = db.session.query(
+                invoice).filter_by(sample_id=model.sample_id).all()
             for invoiceRow in related_invoices:
                 db.session.delete(invoiceRow)
             db.session.commit()
             # Delete all related analytical_test
-            related_invoices = db.session.query(analytical_test).filter_by(sample_id=model.sample_id).all()
+            related_invoices = db.session.query(
+                analytical_test).filter_by(sample_id=model.sample_id).all()
             for invoiceRow in related_invoices:
                 db.session.delete(invoiceRow)
             # Delete all related picked up data
-            related_invoices = db.session.query(pickup_details).filter_by(sample_id=model.sample_id).all()
+            related_invoices = db.session.query(
+                pickup_details).filter_by(sample_id=model.sample_id).all()
             for invoiceRow in related_invoices:
                 db.session.delete(invoiceRow)
             # Delete all related receive data
@@ -116,17 +123,163 @@ class sampleStock(MyModelView):
             db.session.commit()
         except:
             print("Error")
-        
+
+
+# invoice update class
+
+class invoiceDetails(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    column_display_pk = False
+    column_default_sort = ('invoice_id', True)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['invoice_id', 'test_name', 'amount',
+                              'created_by', 'created_date', 'updated_by', 'updated_date']
+    column_filters = ['invoice_id', 'test_name', 'amount',
+                      'created_by', 'created_date', 'updated_by', 'updated_date']
+    can_create = True
+    can_edit = True
+
+    column_editable_list = ['test_name', 'amount']
+    column_list = ('invoice_id', 'test_name', 'amount',
+                   'created_by', 'created_date', 'updated_by', 'updated_date')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = False
+    can_export = False
+    # Remove invoice_id from form_columns
+    form_columns = ['test_name', 'amount']
+
+    # Set the disabled attribute for invoice_id input field
+    form_widget_args = {
+        'invoice_id': {
+            'disabled': True
+        }
+    }
+    @property
+    def can_delete(self):
+        if (current_user.has_role('superuser')):
+            return True
+        return False
+
+
+
+    # on edit
     def after_model_change(self, form, model, is_created):
-        print("after_model_change called", model)
+        try:
+            # print("after_model_change called", str(model))
+            print(str(model.invoice_id))
+        except TypeError:
+            print("Failed to convert to string")
         if not is_created:
+            invoice_id_edited=model.invoice_id
+            related_invoices = db.session.query(invoice_details).filter_by(invoice_id=invoice_id_edited).all()
+            amount=0
+            c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
+            for invoiceRow in related_invoices:
+                amount+=invoiceRow.amount
+                invoiceRow.updated_by=current_user.username
+                invoiceRow.updated_date = updated_date
+            invoiceDb=db.session.query(invoice).filter_by(invoice_id=invoice_id_edited).first()
+            invoiceAmount=0
+            balanceAmount=0
+            if(invoiceDb is not None):
+                invoiceAmount=amount+invoiceDb.gst_amount+invoiceDb.others_amt
+                balanceAmount = invoiceAmount-invoiceDb.paid_amount
+                invoiceDb.total = amount
+                invoiceDb.grand_total=invoiceAmount
+                invoiceDb.bal_amt = balanceAmount
+                invoiceDb.updated_by = current_user.username
+                invoiceDb.updated_date = updated_date
+            else:
+                print("An Error has occured")
+            paymentDb=db.session.query(payment_history).filter_by(invoice_id=invoice_id_edited).first()
+            if(paymentDb is not None):
+                paymentDb.total_amount= invoiceAmount
+                paymentDb.balance_amt = balanceAmount
+            else:
+                print("An Error has occured")
+            db.session.commit()
+            print("Data has been edited")
+        if is_created:
+            print("New Data has been added")
+        
+            
+            
+class invoices(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    column_display_pk = True
+    column_default_sort = ('invoice_id', True)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
+                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
+    column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
+                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
+    column_editable_list = ['gst', 'gst_amount',
+                            'paid_amount', 'status', 'others_amt', 'others_remarks']
+    can_create = False
+    can_edit = True
+    column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'others_amt', 'grand_total', 'paid_amount', 'bal_amt', 'created_by', 'created_date', 'updated_by',
+                   'updated_date', 'status', 'others_remarks')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    can_export = True
+    
+    def after_model_change(self, form, model, is_created):
+        try:
+            # print("after_model_change called", str(model))
+            print(str(model.invoice_id))
+        except TypeError:
+            print("Failed to convert to string")
+        if not is_created:
+            invoice_id_edited = model.invoice_id
+            c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
+            invoiceDb = db.session.query(invoice).filter_by(invoice_id=invoice_id_edited).first()
+            invoiceAmount=0
+            balanceAmount=0
+            paidAmount=0
+            if (invoiceDb is not None):
+                invoiceAmount = invoiceDb.total+invoiceDb.gst_amount+invoiceDb.others_amt
+                balanceAmount = invoiceAmount-invoiceDb.paid_amount
+                paidAmount = invoiceDb.paid_amount
+                invoiceDb.grand_total = invoiceAmount
+                invoiceDb.bal_amt = balanceAmount
+                invoiceDb.updated_by = current_user.username
+                invoiceDb.updated_date = updated_date
+            else:
+                print("An Error has occured")
+            paymentDb = db.session.query(payment_history).filter_by(
+                invoice_id=invoice_id_edited).first()
+            if (paymentDb is not None):
+                paymentDb.total_amount = invoiceAmount
+                paymentDb.paid_amount = paidAmount
+                paymentDb.balance_amt = balanceAmount
+            else:
+                print("An Error has occured")
+            db.session.commit()
             print("Data has been edited")
         if is_created:
             print("New Data has been added")
 
-
-
-
+######################################################################################################
 
 
 class Profile(db.Model, RoleMixin):
@@ -371,7 +524,7 @@ class invoice(db.Model):
     others_amt = db.Column(db.Integer, nullable=True)
     others_remarks = db.Column(db.String(500), nullable=True)
     grand_total = db.Column(db.Integer, nullable=True)
-    
+
     def __str__(self):
         return self.grand_total
 
@@ -525,11 +678,11 @@ def process_data(data, testId):
         sample = data['sample']
         tests = request.form.getlist('selectTest')
         outcome_remarks = ''
-        i=1
+        i = 1
         for test in tests:
-            index=str(i)
+            index = str(i)
             outcome_remarks += index + "."+test+'\n'
-            i+=1
+            i += 1
         #
         #
         # Creation of Id's
@@ -549,22 +702,25 @@ def process_data(data, testId):
         sampleStockDb = sample_stock(sample_id=sample_id, sample_code=sample_code, sample_name=sample_name, sample_description=sample_description, outcome_remarks=outcome_remarks, noof_samples=no_of_test, customer_name=customer_name, address=address, mobile_no=mobileno, phone_no=phno, email_id=email, created_by=created_by, created_time=created_time, counciler_status=defaultStatus, customer_status=defaultStatus,
                                      pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, bread=breed, species_id=species, specimen_id=sample)
         db.session.add(sampleStockDb)
-        invoiceDb = invoice(invoice_id=invoice_id, sample_id=sample_id, total=0, gst=0, gst_amount=0, created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate, paid_amount=0, bal_amt='', status=0, others_amt='', others_remarks='', grand_total='')
+        invoiceDb = invoice(invoice_id=invoice_id, sample_id=sample_id, total=0, gst=0, gst_amount=0, created_by=created_by, created_date=created_date,
+                            updated_by=0, updated_date=defaultDate, paid_amount=0, bal_amt=0, status=0, others_amt=0, others_remarks='', grand_total=0)
         db.session.add(invoiceDb)
         for test in tests:
-            test_id+=1
-            invoice_detailsDb = invoice_details(invoice_id=invoice_id, test_name=test, amount=0, created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate)
+            test_id += 1
+            invoice_detailsDb = invoice_details(invoice_id=invoice_id, test_name=test, amount=0,
+                                                created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate)
             db.session.add(invoice_detailsDb)
-            analytical_testDb = analytical_test(test_id=test_id,test_name=test, sample_id=sample_id,
+            analytical_testDb = analytical_test(test_id=test_id, test_name=test, sample_id=sample_id,
                                                 outcome_result='', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
             db.session.add(analytical_testDb)
         pickupDb = pickup_details(sample_id=sample_id, picked_by='', picked_date=defaultDate,
-                            remarks='', created_by=created_by)
+                                  remarks='', created_by=created_by)
         db.session.add(pickupDb)
         receiveDb = receive_details(sample_id=sample_id, received_by='', received_date=defaultDate,
                                     remarks='', created_by=created_by, vet_remarks='', vetremarks_updated_by='', vetremarks_updated_date=defaultDate)
         db.session.add(receiveDb)
-        paymentDb = payment_history(invoice_id=invoice_id, payment_mode='', total_amount=0, paid_amount=0, balance_amt=0, status=0, payment_collected_by='', payment_collected_date=defaultDate)
+        paymentDb = payment_history(invoice_id=invoice_id, payment_mode='', total_amount='', paid_amount='',
+                                    balance_amt='', status=0, payment_collected_by='', payment_collected_date=defaultDate)
         db.session.add(paymentDb)
         db.session.commit()
         return
