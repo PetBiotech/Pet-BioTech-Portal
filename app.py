@@ -6,11 +6,11 @@ import string
 import random
 from flask_admin.contrib.sqla import ModelView
 # from flask_restful import Api, Resource
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from model_views import (
-    testAdminView, MyModelView, usernameview, testView1, samplep, report, invoiceDetails, paymentHistory, pickupDetails,
-    receiveDetails, sampleStock, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
+    MyModelView, usernameview, invoiceDetails, paymentHistory, pickupDetails,
+    receiveDetails, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
 )
 import pyautogui
 import forms
@@ -28,7 +28,6 @@ from flask_admin import BaseView, expose
 from flask_admin import helpers as admin_helpers
 # from flask_admin.contrib import sqlasql
 from datetime import datetime
-
 
 def create_app():
     # The template files will be stored in the [templates] directory
@@ -52,35 +51,45 @@ user_profiles = db.Table(
     db.Column('profile_id', db.Integer(), db.ForeignKey('profile.id'))
 )
 
-
 class sampleStock(MyModelView):
-
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
             return False
         if current_user.has_role('superuser') or current_user.has_role('user'):
             return True
         return False
-
+    column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
+                       'email_id', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
+    column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
+                                  'email_id', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id']
+    column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
+                          'email_id', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id']
+    column_editable_list = ['sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name',
+                                'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+    # other functions
     column_display_pk = True
     column_default_sort = ('sample_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date',
-                              'total_sample_price', 'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
-    column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date', 'total_sample_price',
-                      'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
-    column_editable_list = ['sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date', 'total_sample_price',
-                            'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
     can_create = True
     can_edit = True
-    column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                   'email_id', 'created_by', 'created_date', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
+    # column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
+    #                'email_id', 'created_by', 'created_date', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
     can_view_details = True
     page_size = 50
     create_modal = True
     edit_modal = True
     can_export = True
     can_delete = True
+
+    form_columns = ('sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address',
+                    'mobile_no', 'phone_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id')
+
+    # Set the disabled attribute for invoice_id input field
+    # form_widget_args = {
+    #     'sample_code': {
+    #         'disabled': True
+    #     }
+    # }
 
     def on_model_delete(self, model):
         # Delete all related invoices_details
@@ -163,15 +172,15 @@ class invoiceDetails(MyModelView):
             'disabled': True
         }
     }
+
     @property
     def can_delete(self):
         if (current_user.has_role('superuser')):
             return True
         return False
 
-
-
     # on edit
+
     def after_model_change(self, form, model, is_created):
         try:
             # print("after_model_change called", str(model))
@@ -179,31 +188,34 @@ class invoiceDetails(MyModelView):
         except TypeError:
             print("Failed to convert to string")
         if not is_created:
-            invoice_id_edited=model.invoice_id
-            related_invoices = db.session.query(invoice_details).filter_by(invoice_id=invoice_id_edited).all()
-            amount=0
+            invoice_id_edited = model.invoice_id
+            related_invoices = db.session.query(invoice_details).filter_by(
+                invoice_id=invoice_id_edited).all()
+            amount = 0
             c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
             for invoiceRow in related_invoices:
-                amount+=invoiceRow.amount
-                invoiceRow.updated_by=current_user.username
+                amount += invoiceRow.amount
+                invoiceRow.updated_by = current_user.username
                 invoiceRow.updated_date = updated_date
-            invoiceDb=db.session.query(invoice).filter_by(invoice_id=invoice_id_edited).first()
-            invoiceAmount=0
-            balanceAmount=0
-            if(invoiceDb is not None):
-                invoiceAmount=amount+invoiceDb.gst_amount+invoiceDb.others_amt
+            invoiceDb = db.session.query(invoice).filter_by(
+                invoice_id=invoice_id_edited).first()
+            invoiceAmount = 0
+            balanceAmount = 0
+            if (invoiceDb is not None):
+                invoiceAmount = amount+invoiceDb.gst_amount+invoiceDb.others_amt
                 balanceAmount = invoiceAmount-invoiceDb.paid_amount
                 invoiceDb.total = amount
-                invoiceDb.grand_total=invoiceAmount
+                invoiceDb.grand_total = invoiceAmount
                 invoiceDb.bal_amt = balanceAmount
                 invoiceDb.updated_by = current_user.username
                 invoiceDb.updated_date = updated_date
             else:
                 print("An Error has occured")
-            paymentDb=db.session.query(payment_history).filter_by(invoice_id=invoice_id_edited).first()
-            if(paymentDb is not None):
-                paymentDb.total_amount= invoiceAmount
+            paymentDb = db.session.query(payment_history).filter_by(
+                invoice_id=invoice_id_edited).first()
+            if (paymentDb is not None):
+                paymentDb.total_amount = invoiceAmount
                 paymentDb.balance_amt = balanceAmount
             else:
                 print("An Error has occured")
@@ -211,9 +223,8 @@ class invoiceDetails(MyModelView):
             print("Data has been edited")
         if is_created:
             print("New Data has been added")
-        
-            
-            
+
+
 class invoices(MyModelView):
 
     def is_accessible(self):
@@ -241,7 +252,7 @@ class invoices(MyModelView):
     create_modal = True
     edit_modal = True
     can_export = True
-    
+
     def after_model_change(self, form, model, is_created):
         try:
             # print("after_model_change called", str(model))
@@ -252,10 +263,11 @@ class invoices(MyModelView):
             invoice_id_edited = model.invoice_id
             c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
-            invoiceDb = db.session.query(invoice).filter_by(invoice_id=invoice_id_edited).first()
-            invoiceAmount=0
-            balanceAmount=0
-            paidAmount=0
+            invoiceDb = db.session.query(invoice).filter_by(
+                invoice_id=invoice_id_edited).first()
+            invoiceAmount = 0
+            balanceAmount = 0
+            paidAmount = 0
             if (invoiceDb is not None):
                 invoiceAmount = invoiceDb.total+invoiceDb.gst_amount+invoiceDb.others_amt
                 balanceAmount = invoiceAmount-invoiceDb.paid_amount
@@ -276,6 +288,8 @@ class invoices(MyModelView):
                 print("An Error has occured")
             db.session.commit()
             print("Data has been edited")
+            # refresh code
+            pyautogui.hotkey('f5')
         if is_created:
             print("New Data has been added")
 
@@ -711,7 +725,7 @@ def process_data(data, testId):
                                                 created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate)
             db.session.add(invoice_detailsDb)
             analytical_testDb = analytical_test(test_id=test_id, test_name=test, sample_id=sample_id,
-                                                outcome_result='', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
+                                                outcome_result='null', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
             db.session.add(analytical_testDb)
         pickupDb = pickup_details(sample_id=sample_id, picked_by='', picked_date=defaultDate,
                                   remarks='', created_by=created_by)

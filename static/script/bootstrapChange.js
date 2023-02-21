@@ -21,5 +21,15 @@ window.onload = function () {
             result.style.color = "white";
             result.style.padding = "10px 25px";
         }
+        if (result.textContent == 'NULL' || result.textContent == 'null' || result.textContent == 'Null') {
+            result.style.backgroundColor = "#151515";
+            result.style.color = "white";
+            result.style.padding = "10px 25px";
+        }
     })
+}
+function reloadModel(){
+if("{{ session.get('model_changed')}} == 'xyz'"){
+    location.reload();
+}
 }
