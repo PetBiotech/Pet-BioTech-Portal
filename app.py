@@ -351,6 +351,47 @@ class analyticalTest(MyModelView):
             return True
         return False
 
+    @action('generate_result', 'Generate Resultsheet', 'Are you sure you want to generate a result sheet?')
+    @expose('/generate-result', methods=['POST'])
+    def generate_result(self, ids):
+        # Get the selected records
+        records = analytical_test.query.filter(
+            analytical_test.test_id.in_(ids)).all()
+
+        # Get the data for the selected records
+        selected_ids = [record.sample_id for record in records]
+
+        data = analytical_test.query.filter(
+            analytical_test.sample_id.in_(selected_ids)).all()
+
+        # Create a list of dictionaries with the necessary attributes
+        form_data = []
+        for d in data:
+
+            sample = sample_stock.query.get(d.sample_id)
+
+            form_data.append({
+                'sample_id': sample.sample_id,
+                'sample_name': sample.sample_name,
+                'test_name': d.test_name,
+                'outcome_result': d.outcome_result,
+            })
+        r_data = []
+        species_data = {1: "Canine", 2: "Feline", 3: "Avian"}
+        row_data = sample_stock.query.filter(
+            sample_stock.sample_id.in_(selected_ids)).all()
+        for r in row_data:
+            r_data.append({
+                'date': r.created_date,
+                'customer_name': r.customer_name,
+                'age': r.age,
+                'email': r.email_id,
+                'phno': r.phone_no,
+                'pet_name': r.sample_name,
+                'species': (species_data.get(r.species_id))})
+        # Render the template with the form data
+        return self.render('my_action.html', data=form_data, r_data=r_data)
+
     column_display_pk = True
     column_default_sort = ('test_id', True)
     #form_columns = ['id', 'desc']
@@ -370,13 +411,16 @@ class analyticalTest(MyModelView):
     can_export = True
 
     def after_model_change(self, form, model, is_created):
+        print("Hello")
         if not is_created:
+            print("Hello2")
             test_id = model.test_id
             c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
             resultDb = db.session.query(
                 analytical_test).filter_by(test_id=test_id).first()
             if (resultDb is not None):
+                print("Hello3")
                 summaryTest = db.session.query(
                     FinalTestView).filter_by(test_id=test_id).first()
                 summaryTest.outcome_result = resultDb.outcome_result
@@ -390,6 +434,8 @@ class analyticalTest(MyModelView):
             pyautogui.hotkey('f5')
         if is_created:
             print("New Data has been added")
+
+
 ######################################################################################################
 
 
@@ -701,78 +747,6 @@ class testUserView(BaseView):
 
 
 
-class analyticalTest(MyModelView):
-
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
-    
-    @action('generate_result', 'Generate Resultsheet', 'Are you sure you want to generate a result sheet?')
-    @expose('/generate-result', methods=['POST'])
-    def generate_result(self, ids):
-        # Get the selected records
-        records = analytical_test.query.filter(analytical_test.test_id.in_(ids)).all()
-        
-        # Get the data for the selected records
-        selected_ids = [record.sample_id for record in records]
-        
-        data = analytical_test.query.filter(analytical_test.sample_id.in_(selected_ids)).all()
-        
-        # Create a list of dictionaries with the necessary attributes
-        form_data = []
-        for d in data:
-            
-            sample = sample_stock.query.get(d.sample_id)
-            
-            form_data.append({
-                'sample_id': sample.sample_id,
-                'sample_name': sample.sample_name,
-                'test_name':d.test_name,
-                'outcome_result':d.outcome_result,
-            })
-        r_data=[]
-        species_data={1:"Canine",2:"Feline",3:"Avian"}
-        row_data = sample_stock.query.filter(sample_stock.sample_id.in_(selected_ids)).all()
-        for r in row_data:
-            r_data.append({
-                'date':r.created_date,
-                'customer_name':r.customer_name,
-                'age':r.age,
-                'email':r.email_id,
-                'phno':r.phone_no,
-                'pet_name':r.sample_name,
-                'species':(species_data.get(r.species_id))})
-        # Render the template with the form data
-        return self.render('my_action.html', data=form_data,r_data=r_data)
-    
-    column_display_pk = True
-    column_default_sort = ('test_id', True)
-    #form_columns = ['id', 'desc']
-    column_searchable_list = ['sample_id','status', 'outcome_result', 'test_name']
-    column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
-                      'test_outcome_created_by', 'test_outcome_created_date', 'status']
-    column_editable_list = ['test_name','outcome_result','status']
-    can_create = True
-    can_edit = True
-    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result','status','test_outcome_created_by', 'test_outcome_created_date')
-    can_view_details = True
-    page_size = 50
-    create_modal = True
-    edit_modal = True
-    can_export = True
-
-    def after_model_change(self, form, model, is_created):
-        if not is_created:
-            # refresh code
-            pyautogui.hotkey('f5')
-        if is_created:
-            pass
-
-
-
 
 def get_species_table_data():
     speciess = db.session.query(species).all()
@@ -921,7 +895,7 @@ def process_data(data):
                                                 outcome_result='null', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
             db.session.add(analytical_testDb)
             summaryTableDb = FinalTestView(test_id=test_id, test_name=test, sample_id=sample_id,
-                                           outcome_result='null', client_name=customer_name, sample_code=sample_code, created_date=defaultDate, city_name=city_name)
+                                           outcome_result='null', client_name=customer_name, sample_code=sample_code, created_date=created_date, city_name=city_name)
             db.session.add(summaryTableDb)
         pickupDb = pickup_details(sample_id=sample_id, picked_by='', picked_date=defaultDate,
                                   remarks='', created_by=created_by)
