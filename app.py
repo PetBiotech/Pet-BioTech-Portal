@@ -1,11 +1,10 @@
 import json
-from pymysql import NULL
 from wtforms import SelectField
 from flask_wtf import FlaskForm
 import string
 import random
 from flask_admin.contrib.sqla import ModelView
-# from flask_restful import Api, Resource
+
 from flask import Flask, jsonify, request, session
 from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from model_views import (
@@ -15,6 +14,7 @@ from model_views import (
 import pyautogui
 import forms
 import os
+from flask_admin.actions import action
 from flask import (Flask, url_for, render_template,
                    abort, redirect
                    )
@@ -233,15 +233,15 @@ class invoices(MyModelView):
     column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'others_amt', 'others_remarks', 'grand_total']
+                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
     column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'others_amt', 'others_remarks', 'grand_total']
+                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
     column_editable_list = ['gst', 'gst_amount',
-                            'paid_amount', 'others_amt', 'others_remarks']
+                            'paid_amount', 'status', 'others_amt', 'others_remarks']
     can_create = False
     can_edit = True
     column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'others_amt', 'grand_total', 'paid_amount', 'bal_amt', 'created_by', 'created_date', 'updated_by',
-                   'updated_date', 'others_remarks')
+                   'updated_date', 'status', 'others_remarks')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -287,7 +287,6 @@ class invoices(MyModelView):
             pyautogui.hotkey('f5')
         if is_created:
             print("New Data has been added")
-
 
 class paymentHistory(MyModelView):
 
@@ -372,22 +371,17 @@ class analyticalTest(MyModelView):
 
     def after_model_change(self, form, model, is_created):
         if not is_created:
-            # refresh code
-            pyautogui.hotkey('f5')
-        if is_created:
-            print("New Data has been added")
-            
-    def after_model_change(self, form, model, is_created):
-        if not is_created:
             test_id = model.test_id
             c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
-            resultDb = db.session.query(analytical_test).filter_by(test_id=test_id).first()
+            resultDb = db.session.query(
+                analytical_test).filter_by(test_id=test_id).first()
             if (resultDb is not None):
-                    summaryTest=db.session.query(FinalTestView).filter_by(test_id=test_id).first()
-                    summaryTest.outcome_result=resultDb.outcome_result
-                    resultDb.test_outcome_created_by=current_user.username
-                    resultDb.test_outcome_created_date=updated_date
+                summaryTest = db.session.query(
+                    FinalTestView).filter_by(test_id=test_id).first()
+                summaryTest.outcome_result = resultDb.outcome_result
+                resultDb.test_outcome_created_by = current_user.username
+                resultDb.test_outcome_created_date = updated_date
             else:
                 print("An Error has occured")
             db.session.commit()
@@ -396,10 +390,6 @@ class analyticalTest(MyModelView):
             pyautogui.hotkey('f5')
         if is_created:
             print("New Data has been added")
-            
-            
-            
-            
 ######################################################################################################
 
 
@@ -651,8 +641,8 @@ class invoice(db.Model):
 
     def __str__(self):
         return self.grand_total
-    
-    
+
+
 class FinalTestView(db.Model):
     __tablename__ = 'FinalTestView'
     test_id = db.Column(db.Integer, db.ForeignKey(
@@ -668,8 +658,6 @@ class FinalTestView(db.Model):
 
     def __repr__(self):
         return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
-
-
 
 # --------------------------------
 # MODEL VIEW CLASSES
@@ -710,6 +698,80 @@ class testUserView(BaseView):
         clinicalTestData = get_clinicalTest_table_data()
         clinicalTestDatas = json.dumps(clinicalTestData)
         return self.render('admin/usertest.html', speciesData=speciesData, specimenData=specimenData, locationData=locationData, clinicalTestData=clinicalTestDatas, admin_base_template=admin.base_template)
+
+
+
+class analyticalTest(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+    
+    @action('generate_result', 'Generate Resultsheet', 'Are you sure you want to generate a result sheet?')
+    @expose('/generate-result', methods=['POST'])
+    def generate_result(self, ids):
+        # Get the selected records
+        records = analytical_test.query.filter(analytical_test.test_id.in_(ids)).all()
+        
+        # Get the data for the selected records
+        selected_ids = [record.sample_id for record in records]
+        
+        data = analytical_test.query.filter(analytical_test.sample_id.in_(selected_ids)).all()
+        
+        # Create a list of dictionaries with the necessary attributes
+        form_data = []
+        for d in data:
+            
+            sample = sample_stock.query.get(d.sample_id)
+            
+            form_data.append({
+                'sample_id': sample.sample_id,
+                'sample_name': sample.sample_name,
+                'test_name':d.test_name,
+                'outcome_result':d.outcome_result,
+            })
+        r_data=[]
+        species_data={1:"Canine",2:"Feline",3:"Avian"}
+        row_data = sample_stock.query.filter(sample_stock.sample_id.in_(selected_ids)).all()
+        for r in row_data:
+            r_data.append({
+                'date':r.created_date,
+                'customer_name':r.customer_name,
+                'age':r.age,
+                'email':r.email_id,
+                'phno':r.phone_no,
+                'pet_name':r.sample_name,
+                'species':(species_data.get(r.species_id))})
+        # Render the template with the form data
+        return self.render('my_action.html', data=form_data,r_data=r_data)
+    
+    column_display_pk = True
+    column_default_sort = ('test_id', True)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['sample_id','status', 'outcome_result', 'test_name']
+    column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
+                      'test_outcome_created_by', 'test_outcome_created_date', 'status']
+    column_editable_list = ['test_name','outcome_result','status']
+    can_create = True
+    can_edit = True
+    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result','status','test_outcome_created_by', 'test_outcome_created_date')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    can_export = True
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            # refresh code
+            pyautogui.hotkey('f5')
+        if is_created:
+            pass
+
+
 
 
 def get_species_table_data():
@@ -1046,7 +1108,6 @@ def build_sample_db():
 #         else:
 #             eachTest.specimen_name = "Unknown"
 #     db.session.commit()
-    
 # --------------------------------
 # MAIN APP
 # --------------------------------
