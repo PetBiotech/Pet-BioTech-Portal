@@ -4,21 +4,20 @@
 <form method="POST" class="form-horizontal createTestForm" id="createTestForm" autocomplete="off">
   <div class="leftForm formDiv">
     <div class="form-group">
-      <div class="col-xs-8">
-        <input id="testid" name="testid" type="text" required="required" class="form-control" disabled
-          style="display: none;">
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="username" class="control-label col-xs-4">Owner Name <span
+      <label for="sampleCode" class="control-label col-xs-4">Sample Code <span
           style="color: red; font-size: 16px;">*</span></label>
       <div class="col-xs-8">
-        <input id="username" name="username" placeholder="Customer Name" type="text" required="required"
-          class="form-control">
+        <input id="sampleCode" name="sampleCode" type="text" required="required" class="form-control">
       </div>
     </div>
     <div class="form-group">
-      <label for="clinicname" class="control-label col-xs-4">Sample Name</label>
+      <label for="username" class="control-label col-xs-4">Client Name </label>
+      <div class="col-xs-8">
+        <input id="username" name="username" placeholder="Customer Name" type="text" class="form-control">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="clinicname" class="control-label col-xs-4">Pet Name</label>
       <div class="col-xs-8">
         <input id="clinicname" name="clinicname" placeholder="Sample name/pet name" type="text" class="form-control">
       </div>
@@ -59,9 +58,8 @@
         <input id="age" name="age" placeholder="Pet's Age" type="text" class="form-control">
       </div>
     </div>
-    <div class="form-group">
-      <label for="number" class="control-label col-xs-4">No of tests <span
-          style="color: red; font-size: 16px;">*</span></label>
+    <div class="form-group" style="display:none">
+      <label for="number" class="control-label col-xs-4">No of tests </label>
       <div class="col-xs-8">
         <input type="number" name="no_of_test" id="no_of_test" class="form-control no_of_test">
       </div>
@@ -134,10 +132,10 @@
    -->
   <div class="rightForm formDiv">
     <div class="form-group">
-      <label for="state" class="control-label col-xs-4">State <span
-          style="color: red; font-size: 16px;">*</span></label>
+      <label for="state" class="control-label col-xs-4">State</label>
       <div class="col-xs-8">
         <select id="state" name="state" class="select form-control" required="required">
+          <option value="Other">Other</option>
           <option value="Andhra Pradesh">Andhra Pradesh</option>
           <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
           <option value="Arunachal Pradesh">Arunachal Pradesh</option>
@@ -178,7 +176,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="city" class="control-label col-xs-4">City <span style="color: red; font-size: 16px;">*</span></label>
+      <label for="city" class="control-label col-xs-4">City </label>
       <div class="col-xs-8">
         <select id="city" name="city" required="required" class="select form-control"
           aria-describedby="sampleHelpBlock">
@@ -189,32 +187,27 @@
       </div>
     </div>
     <div class="form-group">
-      <label for="address" class="control-label col-xs-4">Address <span
-          style="color: red; font-size: 16px;">*</span></label>
+      <label for="address" class="control-label col-xs-4">Address </label>
       <div class="col-xs-8">
-        <textarea id="address" name="address" cols="40" rows="5" required="required" class="form-control"></textarea>
+        <textarea id="address" name="address" cols="40" rows="5" class="form-control"></textarea>
       </div>
     </div>
     <div class="form-group">
-      <label for="pincode" class="control-label col-xs-4">Pin Code <span
-          style="color: red; font-size: 16px;">*</span></label>
+      <label for="pincode" class="control-label col-xs-4">Pin Code </label>
       <div class="col-xs-8">
-        <input id="pincode" name="pincode" placeholder="Pin Code" type="number" class="form-control"
-          required="required">
+        <input id="pincode" name="pincode" placeholder="Pin Code" type="number" class="form-control">
       </div>
     </div>
     <div class="form-group">
-      <label for="phno" class="control-label col-xs-4">Phone No <span
-          style="color: red; font-size: 16px;">*</span></label>
+      <label for="phno" class="control-label col-xs-4">Phone No </label>
       <div class="col-xs-8">
-        <input id="phno" name="phno" placeholder="Phone Number" type="number" required="required" class="form-control">
+        <input id="phno" name="phno" placeholder="Phone Number" type="number" class="form-control">
       </div>
     </div>
     <div class="form-group">
-      <label for="email" class="control-label col-xs-4">Email <span
-          style="color: red; font-size: 16px;">*</span></label>
+      <label for="email" class="control-label col-xs-4">Email </label>
       <div class="col-xs-8">
-        <input id="email" name="email" placeholder="Email" type="email" required="required" class="form-control">
+        <input id="email" name="email" placeholder="Email" type="email" class="form-control">
       </div>
     </div>
     <div class="form-group" style="display: flex;margin-top: 25px;">

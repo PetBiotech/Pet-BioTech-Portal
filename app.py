@@ -9,8 +9,8 @@ from flask_admin.contrib.sqla import ModelView
 from flask import Flask, jsonify, request, session
 from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from model_views import (
-    finalTestTableView,MyModelView, usernameview, invoiceDetails, paymentHistory, pickupDetails,
-    receiveDetails, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
+    finalTestTableView,MyModelView, usernameview, pickupDetails,
+    receiveDetails, Allspecies, Allspecimen, ourEmployee, locationViews, clinicalTestViews
 )
 import pyautogui
 import forms
@@ -58,22 +58,20 @@ class sampleStock(MyModelView):
         if current_user.has_role('superuser') or current_user.has_role('user'):
             return True
         return False
-    column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                       'email_id', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
+    column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'customer_name', 'address', 'mobile_no',
+                       'email_id', 'age', 'gender', 'pincode', 'bread', 'location_name', 'species_name', 'specimen_name')
     column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                                  'email_id', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id']
+                                  'email_id', 'age', 'gender', 'pincode', 'bread', 'location_name', 'species_name', 'specimen_name']
     column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                          'email_id', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id']
+                          'email_id', 'age', 'gender', 'pincode', 'bread', 'location_name', 'species_name', 'specimen_name']
     column_editable_list = ['sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name',
-                                'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
+                                'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_name', 'bread', 'species_name', 'specimen_name']
     # other functions
     column_display_pk = True
     column_default_sort = ('sample_id', True)
     #form_columns = ['id', 'desc']
     can_create = True
     can_edit = True
-    # column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-    #                'email_id', 'created_by', 'created_date', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -83,13 +81,6 @@ class sampleStock(MyModelView):
 
     form_columns = ('sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address',
                     'mobile_no', 'phone_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id')
-
-    # Set the disabled attribute for invoice_id input field
-    # form_widget_args = {
-    #     'sample_code': {
-    #         'disabled': True
-    #     }
-    # }
 
     def on_model_delete(self, model):
         # Delete all related invoices_details
@@ -127,6 +118,11 @@ class sampleStock(MyModelView):
             # Delete all related receive data
             related_invoices = db.session.query(
                 receive_details).filter_by(sample_id=model.sample_id).all()
+            for invoiceRow in related_invoices:
+                db.session.delete(invoiceRow)
+             # Delete all related summary data
+            related_invoices = db.session.query(
+                FinalTestView).filter_by(sample_id=model.sample_id).all()
             for invoiceRow in related_invoices:
                 db.session.delete(invoiceRow)
             db.session.commit()
@@ -183,7 +179,6 @@ class invoiceDetails(MyModelView):
 
     def after_model_change(self, form, model, is_created):
         try:
-            # print("after_model_change called", str(model))
             print(str(model.invoice_id))
         except TypeError:
             print("Failed to convert to string")
@@ -310,8 +305,6 @@ class paymentHistory(MyModelView):
                               'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
     column_filters = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
                       'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    # column_editable_list = ['payment_mode', 'total_amount', 'paid_amount',
-    #                         'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
     column_editable_list = ['payment_mode', 'status']
     can_create = False
     can_edit = True
@@ -348,6 +341,65 @@ class paymentHistory(MyModelView):
             pyautogui.hotkey('f5')
         if is_created:
             print("New Data has been added")
+            
+            
+class analyticalTest(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    column_display_pk = True
+    column_default_sort = ('test_id', True)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['sample_id',
+                              'status', 'outcome_result', 'test_name']
+    column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
+                      'test_outcome_created_by', 'test_outcome_created_date', 'status']
+    column_editable_list = ['test_name', 'outcome_result', 'status']
+    can_create = True
+    can_edit = True
+    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result',
+                   'status', 'test_outcome_created_by', 'test_outcome_created_date')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    can_export = True
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            # refresh code
+            pyautogui.hotkey('f5')
+        if is_created:
+            print("New Data has been added")
+            
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            test_id = model.test_id
+            c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
+            resultDb = db.session.query(analytical_test).filter_by(test_id=test_id).first()
+            if (resultDb is not None):
+                    summaryTest=db.session.query(FinalTestView).filter_by(test_id=test_id).first()
+                    summaryTest.outcome_result=resultDb.outcome_result
+                    resultDb.test_outcome_created_by=current_user.username
+                    resultDb.test_outcome_created_date=updated_date
+            else:
+                print("An Error has occured")
+            db.session.commit()
+            print("Data has been edited")
+            # refresh code
+            pyautogui.hotkey('f5')
+        if is_created:
+            print("New Data has been added")
+            
+            
+            
+            
 ######################################################################################################
 
 
@@ -474,7 +526,7 @@ class receive_details(db.Model):
 class sample_stock(db.Model):
     sample_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
-    sample_code = db.Column(db.String(20), nullable=True)
+    sample_code = db.Column(db.String(100), nullable=True)
     sample_name = db.Column(db.String(100), nullable=True)
     sample_description = db.Column(db.String(1000), nullable=True)
     outcome_remarks = db.Column(db.String(1000), nullable=True)
@@ -512,7 +564,10 @@ class sample_stock(db.Model):
     # gender = db.Column(db.String(100), nullable=True)
     species_id = db.Column(db.Integer, nullable=True)
     specimen_id = db.Column(db.Integer, nullable=True)
-
+    
+    species_name=db.Column(db.String(100),nullable=True)
+    specimen_name=db.Column(db.String(1000),nullable=True)
+    location_name=db.Column(db.String(100),nullable=True)
     def __str__(self):
         return self.sample_code
 
@@ -615,13 +670,6 @@ class FinalTestView(db.Model):
         return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
 
 
-# class sqlite_sequence(db.Model):
-#     name = db.Column(db.String(500))
-#     seq = db.Column(db.Integer)
-
-#     def __str__(self):
-#         return self.name
-
 
 # --------------------------------
 # MODEL VIEW CLASSES
@@ -652,7 +700,8 @@ class testUserView(BaseView):
         if request.method == 'POST':
             data = request.form
             # print(data)
-            generate_id(data)
+            # generate_id(data)
+            process_data(data)
             return jsonify({'success': True})
         # return self.render('admin/usertest.html')
         speciesData = get_species_table_data()
@@ -699,27 +748,26 @@ def get_clinicalTest_table_data():
     return data
 
 
-def generate_id(data):
-    id = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
-    process_data(data, id)
-    return
+# def generate_id(data):
+#     id = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+#     process_data(data, id)
+#     return
 
 
-def process_data(data, testId):
+def process_data(data):
     # do something with the data
     c_date = '0001-01-01 00:00:01'
     defaultDate = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
     defaultStatus = 0
     try:
-        checkTestId = sample_stock.query.filter_by(sample_code=testId).first()
-        if (checkTestId != None):
-            generate_id(data)
+        # checkTestId = sample_stock.query.filter_by(sample_code=testId).first()
+        # if (checkTestId != None):
+        #     generate_id(data)
         #
         #
         # Backend information
         #
         #
-        sample_code = testId
         c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         created_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
         created_by = current_user.username
@@ -735,6 +783,7 @@ def process_data(data, testId):
         # Owner and Pet details
         #
         #
+        sample_code = data['sampleCode']
         sample_name = data['clinicname']
         sample_description = data['clinicBackground']
         no_of_test = data['no_of_test']
@@ -754,14 +803,24 @@ def process_data(data, testId):
         phno = data['phno']
         mobileno = phno
         email = data['email']
-        address += "\n"+city+" - "+pincode+"\n"+state
+        city_name=''
+        if(int(city) >=1 ):
+            city_name=db.session.query(location).filter_by(location_id=city).first().location_name
+        address += "\n"+city_name+" - "+pincode+"\n"+state
         #
         #
         # Test Details
         #
         #
-        species = data['species']
+        species_id = data['species']
+        species_name=''
+        if( int(species_id) >=1 ):
+            species_name = db.session.query(species).filter_by(
+                species_id=species_id).first().species_name
         sample = data['sample']
+        specimen_name = ''
+        if (int(sample) >= 1):
+            specimen_name = db.session.query(specimen).filter_by(specimen_id=sample).first().specimen_name
         tests = request.form.getlist('selectTest')
         outcome_remarks = ''
         i = 1
@@ -786,7 +845,7 @@ def process_data(data, testId):
         #
         #
         sampleStockDb = sample_stock(sample_id=sample_id, sample_code=sample_code, sample_name=sample_name, sample_description=sample_description, outcome_remarks=outcome_remarks, noof_samples=no_of_test, customer_name=customer_name, address=address, mobile_no=mobileno, phone_no=phno, email_id=email, created_by=created_by, created_time=created_time, counciler_status=defaultStatus, customer_status=defaultStatus,
-                                     pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, bread=breed, species_id=species, specimen_id=sample)
+                                     pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, bread=breed, species_id=species_id, specimen_id=sample,species_name=species_name,specimen_name=specimen_name,location_name=city_name)
         db.session.add(sampleStockDb)
         invoiceDb = invoice(invoice_id=invoice_id, sample_id=sample_id, total=0, gst=0, gst_amount=0, created_by=created_by, created_date=created_date,
                             updated_by=0, updated_date=defaultDate, paid_amount=0, bal_amt=0, status=0, others_amt=0, others_remarks='', grand_total=0)
@@ -799,6 +858,9 @@ def process_data(data, testId):
             analytical_testDb = analytical_test(test_id=test_id, test_name=test, sample_id=sample_id,
                                                 outcome_result='null', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
             db.session.add(analytical_testDb)
+            summaryTableDb = FinalTestView(test_id=test_id, test_name=test, sample_id=sample_id,
+                                           outcome_result='null', client_name=customer_name, sample_code=sample_code, created_date=defaultDate, city_name=city_name)
+            db.session.add(summaryTableDb)
         pickupDb = pickup_details(sample_id=sample_id, picked_by='', picked_date=defaultDate,
                                   remarks='', created_by=created_by)
         db.session.add(pickupDb)
@@ -824,54 +886,14 @@ admin = flask_admin.Admin(
     template_mode='bootstrap3',
 )
 
-# desc = data['address']
-# current_time = datetime.now()
-# clinic = data['clinicname']
-# loaction = data['state']
-# breed = data['breed']
-# sample = data['sample']
-# species = data['species']
-# age = data['age']
-# owner = data['username']
-# mobile = data['phno']
-# tests = data['testBox1']
-# print(testId)
-# # date=current_time,
-# testDb = test(id=testId, desc=desc, date=current_time,
-#               Clinic_ReferralName=clinic, Location=loaction, Breed=breed, Sample=sample, Species=species, Age=age, Owner=owner, Mobile=mobile, Tests=tests)
-# db.session.add(testDb)
-# db.session.commit()
-
-# paymentDb = testPayment(Testid=testId, Owner=owner,Clinic_ReferralName=clinic,Mobile=mobile)
-# db.session.add(paymentDb)
-# db.session.commit()
-# visible for users and admin
-
-# manage sample tab
-# admin.add_view(testUserView(name="Create Order",
-#                endpoint='usertest', category='Manage Orders'))
-# admin.add_view(testAdminView(test, db.session,
-#                name="Order History", category="Manage Orders"))
-# admin.add_view(testView1(name="Legacy Sample Request",category='Manage Orders'))
-
-# Sample Tracking tab
-# admin.add_view(samplep(testPayment, db.session, name="Payment / Blue Dart"))
-
-
-# # Invoice tab
-# admin.add_view(invoice(name="Invoice1", category='Inovice'))
-
-# # Report tab
-# admin.add_view(report(name="Report1", category="Report"))
-
 ########################################### Admin vies for the database table#######################################################
 # visible only for admin
 
 # orders
 admin.add_view(testUserView(name="Create Order",
-               endpoint='usertest', category='Orders'))
+               endpoint='usertest'))
 admin.add_view(sampleStock(sample_stock, db.session,
-               name="Show Orders", category="Orders"))
+               name="Show Orders"))
 
 # invoice menu
 admin.add_view(invoiceDetails(invoice_details, db.session,
@@ -879,15 +901,13 @@ admin.add_view(invoiceDetails(invoice_details, db.session,
 admin.add_view(invoices(invoice, db.session, name="Final Invoices",
                category="Invoice"))
 
-# payment
+# payment, pickup and receive
 admin.add_view(paymentHistory(payment_history, db.session,
-               name="Payment History"))
-
-# pickup and receive
+               name="Payment History", category="Others"))
 admin.add_view(pickupDetails(pickup_details, db.session,
-               name="Pickup Details", category="Pickup & Receive"))
+               name="Pickup Details", category="Others"))
 admin.add_view(receiveDetails(receive_details, db.session,
-               name="Received Details", category="Pickup & Receive"))
+               name="Received Details", category="Others"))
 
 # result
 admin.add_view(analyticalTest(analytical_test, db.session,
@@ -903,6 +923,10 @@ admin.add_view(locationViews(location, db.session,
 admin.add_view(clinicalTestViews(clinicalTest, db.session,
                name="Clinical Tests", category="Functionality"))
 
+# final table
+admin.add_view(finalTestTableView(FinalTestView, db.session,
+               name="Summary"))
+
 # admins and employees
 admin.add_view(MyModelView(Profile, db.session,
                name="Profiles", category="Employees"))
@@ -910,11 +934,6 @@ admin.add_view(usernameview(Username, db.session,
                name="New Employees", category="Employees"))
 admin.add_view(ourEmployee(employee, db.session,
                name="Old Employees", category="Employees"))
-
-
-# final table
-admin.add_view(finalTestTableView(FinalTestView, db.session,
-               name="Summary"))
 
 
 ##################################################################################################
@@ -1009,6 +1028,24 @@ def build_sample_db():
 #         db.session.add(finalDb)
 #     db.session.commit()
 
+
+# def update_location_species_specimen():
+#     resultTest=db.session.query(sample_stock).all()
+#     for eachTest in resultTest:
+#         if(eachTest.location_id):
+#             print(eachTest.sample_id)
+#             eachTest.location_name=db.session.query(location).filter_by(location_id=eachTest.location_id).first().location_name
+#         else:
+#             eachTest.location_name="Unknown"
+#         if(eachTest.species_id):
+#             eachTest.species_name=db.session.query(species).filter_by(species_id=eachTest.species_id).first().species_name
+#         else:
+#             eachTest.species_name = "Unknown"
+#         if (eachTest.specimen_id):
+#             eachTest.specimen_name = db.session.query(specimen).filter_by(specimen_id=eachTest.specimen_id).first().specimen_name
+#         else:
+#             eachTest.specimen_name = "Unknown"
+#     db.session.commit()
     
 # --------------------------------
 # MAIN APP
@@ -1029,4 +1066,5 @@ if __name__ == '__main__':
     # db.session.execute(sql)
     # db.session.commit()
     # create_finalTestTbale()
+    # update_location_species_specimen()
     app.run()

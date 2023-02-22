@@ -26,13 +26,6 @@ db = SQLAlchemy()
 
 class MyModelView(sqla.ModelView):
 
-    # @expose("/submit",methods=["POST"])
-    # def submit(self):
-    #     data=request.form
-    #     print(data)
-    #     print("Here I am")
-    #     return redirect("/successForm")
-
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
             return False
@@ -53,12 +46,6 @@ class MyModelView(sqla.ModelView):
                 # login
                 return redirect(url_for('security.login', next=request.url))
 
-
-# @app.route("/successForm")
-# def successForm():
-#     print("Happy Stores")
-
-
 class usernameview(MyModelView):
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
@@ -76,36 +63,6 @@ class usernameview(MyModelView):
 
     column_list = ('id', 'first_name', 'last_name', 'username',
                    'email', 'active', 'roles', 'confirmed_at')
-
-
-
-# class testUserView(BaseView):
-
-# def is_accessible(self):
-# if not current_user.is_active or not current_user.is_authenticated:
-# return False
-# if current_user.has_role('superuser') or current_user.has_role('user'):
-# return True
-# return False
-##
-# @expose('/', methods=['GET', 'POST'])
-# def index(self):
-# data=request.form
-# print(data)
-# return self.render('admin/usertest.html')
-
-    # column_display_pk = True
-    # form_columns = ['id', 'desc']
-    # column_searchable_list = ['desc']
-    # column_filters = ['id']
-    # can_create = True
-    # can_edit = True
-    # can_delete = False  # disable model deletion
-    # can_view_details = True
-    # page_size = 50  # pagination
-    # create_modal = True
-    # edit_modal = True
-    # can_export = True
 
 
 class testAdminView(MyModelView):
@@ -142,155 +99,27 @@ class testAdminView(MyModelView):
     edit_modal = True
     can_export = True
 
-
-# class testView1(BaseView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
-
-#     @expose('/')
-#     def index(self):
-#         return self.render('admin/legacysr.html')
-
-
-# class samplep(MyModelView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
-
-#     column_display_pk = False
-#     column_default_sort = ('id', True)
-#     #form_columns = ['id', 'desc']
-#     column_searchable_list = ['Testid']
-#     column_filters = ['Testid', 'payment', 'Blue_Dart_booked']
-#     column_editable_list = ['payment', 'Blue_Dart_booked']
-#     can_create = False
-#     can_edit = True
-#     column_list = ('Testid', 'Owner', 'Clinic_ReferralName',
-#                    'Mobile', 'payment', 'Blue_Dart_booked')
-#     can_view_details = True
-#     page_size = 50
-#     create_modal = True
-#     edit_modal = True
-#     can_export = True
-
-
-# invoice section
-
-# class invoice(BaseView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
-
-#     @expose('/')
-#     def index(self):
-#         return self.render('admin/invoice.html')
-
-
-# invoice section
-
-
-# class report(BaseView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
-
-#     @expose('/')
-#     def index(self):
-#         return self.render('admin/report.html')
-
-#     @expose('/')
-#     def index(self):
-#         return self.render('admin/hi.html')
-
-
 ###############################################################################################
 # 1
-class invoiceDetails(MyModelView):
+# class invoiceDetails(MyModelView):
 
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
-
-    # column_display_pk = False
-    # column_default_sort = ('invoice_id', True)
-    # #form_columns = ['id', 'desc']
-    # column_searchable_list = ['invoice_id', 'test_name', 'amount',
-    #                           'created_by', 'created_date', 'updated_by', 'updated_date']
-    # column_filters = ['invoice_id', 'test_name', 'amount',
-    #                   'created_by', 'created_date', 'updated_by', 'updated_date']
-    # column_editable_list = ['test_name', 'amount']
-    # can_create = True
-    # can_edit = True
-    # column_list = ('invoice_id', 'test_name', 'amount',
-    #                'created_by', 'created_date', 'updated_by', 'updated_date')
-    # can_view_details = True
-    # page_size = 50
-    # create_modal = True
-    # edit_modal = False
-    # can_export = False
-
-    # @property
-    # def can_delete(self):
-    #     if (current_user.has_role('superuser')):
-    #         return True
-    #     return False
+#     def is_accessible(self):
+#         if not current_user.is_active or not current_user.is_authenticated:
+#             return False
+#         if current_user.has_role('superuser') or current_user.has_role('user'):
+#             return True
+#         return False
 
 
 # 2
-class paymentHistory(MyModelView):
+# class paymentHistory(MyModelView):
 
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
-
-    column_display_pk = False
-    column_default_sort = ('invoice_id', True)
-    #form_columns = ['id', 'desc']
-    column_searchable_list = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
-                              'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    column_filters = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
-                      'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    # column_editable_list = ['payment_mode', 'total_amount', 'paid_amount',
-    #                         'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    column_editable_list = ['payment_mode', 'status']
-    can_create = False
-    can_edit = True
-    column_list = ('invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
-                   'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date')
-    can_view_details = True
-    page_size = 50
-    create_modal = True
-    edit_modal = True
-    can_export = True
-
-    @property
-    def can_delete(self):
-        if (current_user.has_role('superuser')):
-            return True
-        return False
+#     def is_accessible(self):
+#         if not current_user.is_active or not current_user.is_authenticated:
+#             return False
+#         if current_user.has_role('superuser') or current_user.has_role('user'):
+#             return True
+#         return False
 
 # 3
 
@@ -341,17 +170,16 @@ class receiveDetails(MyModelView):
 
     column_display_pk = True
     column_default_sort = ('receive_id', True)
-    #form_columns = ['id', 'desc']
     column_searchable_list = ['receive_id', 'sample_id', 'received_by', 'received_date',
-                              'remarks', 'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date']
+                              'remarks', 'created_by', 'vet_remarks', 'vetremarks_updated_by']
     column_filters = ['receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',
-                      'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date']
+                      'created_by', 'vet_remarks', 'vetremarks_updated_by']
     column_editable_list = ['remarks', 'vet_remarks',
                             'received_by', 'received_date']
     can_create = True
     can_edit = True
     column_list = ('receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',
-                   'created_by', 'vet_remarks', 'vetremarks_updated_by', 'vetremarks_updated_date')
+                   'created_by', 'vet_remarks', 'vetremarks_updated_by')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -375,44 +203,6 @@ class receiveDetails(MyModelView):
 #     #         return True
 #     #     return False
 
-#     column_display_pk = True
-#     column_default_sort = ('sample_id', True)
-#     #form_columns = ['id', 'desc']
-#     column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date',
-#                               'total_sample_price', 'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
-#     column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'phone_no', 'email_id', 'created_by', 'counciler_status', 'customer_status', 'pickup_status', 'created_date', 'total_sample_price',
-#                       'price_unit', 'customer_accepted_by', 'customer_accepted_date', 'result_upload_status', 'pickup_accepted_status', 'receive_accepted_status', 'invoice_status', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id']
-#     # can_create = True
-#     can_edit = True
-#     column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-#                    'email_id', 'created_by', 'created_date', 'updated_by', 'updated_date', 'age', 'gender', 'pincode', 'bread', 'location_id', 'species_id', 'specimen_id')
-#     column_editable_list = ('sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id')
-#     can_view_details = True
-#     page_size = 50
-#     create_modal = True
-#     edit_modal = False
-#     can_export = True
-#     can_delete = True
-    
-#     form_columns = ('sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id')
-
-#     # Set the disabled attribute for invoice_id input field
-#     form_widget_args = {
-#         'sample_code': {
-#             'disabled': True
-#         }
-#     }
-    
-#     @property
-#     def can_create(self):
-#         if (current_user.has_role('superuser')):
-#             return True
-#         return False
-#     # @property
-#     # def can_delete(self):
-#     #     if (current_user.has_role('superuser')):
-#     #         return True
-#     #     return False
 # 6
 
 
@@ -470,37 +260,14 @@ class Allspecimen(MyModelView):
 # 8
 
 
-class analyticalTest(MyModelView):
+# class analyticalTest(MyModelView):
 
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
-
-    column_display_pk = True
-    column_default_sort = ('test_id', True)
-    #form_columns = ['id', 'desc']
-    column_searchable_list = ['sample_id','status', 'outcome_result', 'test_name']
-    column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
-                      'test_outcome_created_by', 'test_outcome_created_date', 'status']
-    column_editable_list = ['test_name','outcome_result','status']
-    can_create = True
-    can_edit = True
-    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result','status','test_outcome_created_by', 'test_outcome_created_date')
-    can_view_details = True
-    page_size = 50
-    create_modal = True
-    edit_modal = True
-    can_export = True
-
-    def after_model_change(self, form, model, is_created):
-        if not is_created:
-            # refresh code
-            pyautogui.hotkey('f5')
-        if is_created:
-            print("New Data has been added")
+#     def is_accessible(self):
+#         if not current_user.is_active or not current_user.is_authenticated:
+#             return False
+#         if current_user.has_role('superuser') or current_user.has_role('user'):
+#             return True
+#         return False
 # 9
 
 
@@ -535,32 +302,14 @@ class ourEmployee(MyModelView):
 # 10
 
 
-class invoices(MyModelView):
+# class invoices(MyModelView):
 
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
-
-    column_display_pk = True
-    column_default_sort = ('invoice_id', True)
-    #form_columns = ['id', 'desc']
-    column_searchable_list = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
-    column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
-    column_editable_list = ['gst', 'gst_amount', 'paid_amount','status', 'others_amt', 'others_remarks']
-    can_create = False
-    can_edit = True
-    column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount','others_amt','grand_total','paid_amount','bal_amt','created_by','created_date', 'updated_by',
-                   'updated_date','status','others_remarks')
-    can_view_details = True
-    page_size = 50
-    create_modal = True
-    edit_modal = True
-    can_export = True
+#     def is_accessible(self):
+#         if not current_user.is_active or not current_user.is_authenticated:
+#             return False
+#         if current_user.has_role('superuser') or current_user.has_role('user'):
+#             return True
+#         return False
 
 
 # 11
