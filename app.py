@@ -601,7 +601,7 @@ class analyticalTest(MyModelView):
             return True
         return False
     
-    @action('generate_result', 'Generate Resultsheet', 'Are you sure you want to generate an result sheet?')
+    @action('generate_result', 'Generate Resultsheet', 'Are you sure you want to generate a result sheet?')
     @expose('/generate-result', methods=['POST'])
     def generate_result(self, ids):
         # Get the selected records
