@@ -78,6 +78,7 @@ class usernameview(MyModelView):
                    'email', 'active', 'roles', 'confirmed_at')
 
 
+
 # class testUserView(BaseView):
 
 # def is_accessible(self):
@@ -508,7 +509,7 @@ class ourEmployee(MyModelView):
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
             return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
+        if current_user.has_role('superuser'):
             return True
         return False
 
@@ -611,4 +612,31 @@ class clinicalTestViews(MyModelView):
     page_size = 50
     create_modal = True
     edit_modal = True
+    can_export = True
+
+
+class finalTestTableView(MyModelView):
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    column_display_pk = False
+    column_default_sort = ('test_id',  True)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['test_id', 'sample_id', 'sample_code', 'client_name',
+                              'test_name', 'outcome_result', 'city_name', 'created_date']
+    column_filters = ['test_id', 'sample_id', 'sample_code', 'client_name',
+                      'test_name', 'outcome_result', 'city_name', 'created_date']
+    column_editable_list = []
+    can_create = False
+    can_edit = False
+    column_list = ('test_id', 'sample_id', 'sample_code', 'client_name',
+                   'test_name', 'outcome_result', 'city_name', 'created_date')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = False
     can_export = True
