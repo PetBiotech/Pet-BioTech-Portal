@@ -175,7 +175,7 @@ class receiveDetails(MyModelView):
     column_filters = ['receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',
                       'created_by', 'vet_remarks', 'vetremarks_updated_by']
     column_editable_list = ['remarks', 'vet_remarks',
-                            'received_by', 'received_date']
+                            'received_by', 'received_date', 'vetremarks_updated_by']
     can_create = True
     can_edit = True
     column_list = ('receive_id', 'sample_id', 'received_by', 'received_date', 'remarks',

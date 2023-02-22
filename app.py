@@ -145,15 +145,15 @@ class invoiceDetails(MyModelView):
     column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['invoice_id', 'test_name', 'amount',
-                              'created_by', 'created_date', 'updated_by', 'updated_date']
+                               'created_date', 'updated_by', 'updated_date']
     column_filters = ['invoice_id', 'test_name', 'amount',
-                      'created_by', 'created_date', 'updated_by', 'updated_date']
+                       'created_date', 'updated_by', 'updated_date']
     can_create = True
     can_edit = True
 
     column_editable_list = ['test_name', 'amount']
     column_list = ('invoice_id', 'test_name', 'amount',
-                   'created_by', 'created_date', 'updated_by', 'updated_date')
+                   'created_date', 'updated_by', 'updated_date')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -232,16 +232,16 @@ class invoices(MyModelView):
     column_display_pk = True
     column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
-    column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
+    column_searchable_list = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_date',
+                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt',  'others_amt', 'others_remarks', 'grand_total']
+    column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_date',
+                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt',  'others_amt', 'others_remarks', 'grand_total']
     column_editable_list = ['gst', 'gst_amount',
-                            'paid_amount', 'status', 'others_amt', 'others_remarks']
+                            'paid_amount',  'others_amt', 'others_remarks']
     can_create = False
     can_edit = True
-    column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'others_amt', 'grand_total', 'paid_amount', 'bal_amt', 'created_by', 'created_date', 'updated_by',
-                   'updated_date', 'status', 'others_remarks')
+    column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'others_amt', 'grand_total', 'paid_amount', 'bal_amt','created_date', 'updated_by',
+                   'updated_date', 'others_remarks')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -403,7 +403,7 @@ class analyticalTest(MyModelView):
     can_create = True
     can_edit = True
     column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result',
-                   'status', 'test_outcome_created_by', 'test_outcome_created_date')
+                    'test_outcome_created_by', 'test_outcome_created_date')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -411,16 +411,17 @@ class analyticalTest(MyModelView):
     can_export = True
 
     def after_model_change(self, form, model, is_created):
-        print("Hello")
         if not is_created:
-            print("Hello2")
             test_id = model.test_id
             c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
             resultDb = db.session.query(
                 analytical_test).filter_by(test_id=test_id).first()
             if (resultDb is not None):
-                print("Hello3")
+                if(resultDb.outcome_result=='Positive' or resultDb.outcome_result=='positive' or resultDb.outcome_result=='Pos' or resultDb.outcome_result=='pos'):
+                    resultDb.status=1
+                else:
+                    resultDb.status=0
                 summaryTest = db.session.query(
                     FinalTestView).filter_by(test_id=test_id).first()
                 summaryTest.outcome_result = resultDb.outcome_result
