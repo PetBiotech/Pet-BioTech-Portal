@@ -1,20 +1,20 @@
 import json
-from pymysql import NULL
 from wtforms import SelectField
 from flask_wtf import FlaskForm
 import string
 import random
 from flask_admin.contrib.sqla import ModelView
-# from flask_restful import Api, Resource
+
 from flask import Flask, jsonify, request, session
 from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from model_views import (
-    finalTestTableView,MyModelView, usernameview, invoiceDetails, paymentHistory, pickupDetails,
-    receiveDetails, Allspecies, Allspecimen, analyticalTest, ourEmployee, invoices, locationViews, clinicalTestViews
+    MyModelView, usernameview, invoiceDetails, paymentHistory, pickupDetails,
+    receiveDetails, Allspecies, Allspecimen, ourEmployee, invoices, locationViews, clinicalTestViews
 )
 import pyautogui
 import forms
 import os
+from flask_admin.actions import action
 from flask import (Flask, url_for, render_template,
                    abort, redirect
                    )
@@ -238,15 +238,15 @@ class invoices(MyModelView):
     column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
     column_searchable_list = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'others_amt', 'others_remarks', 'grand_total']
+                              'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
     column_filters = ['invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'created_by', 'created_date',
-                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'others_amt', 'others_remarks', 'grand_total']
+                      'updated_by', 'updated_date', 'paid_amount', 'bal_amt', 'status', 'others_amt', 'others_remarks', 'grand_total']
     column_editable_list = ['gst', 'gst_amount',
-                            'paid_amount', 'others_amt', 'others_remarks']
+                            'paid_amount', 'status', 'others_amt', 'others_remarks']
     can_create = False
     can_edit = True
     column_list = ('invoice_id', 'sample_id', 'total', 'gst', 'gst_amount', 'others_amt', 'grand_total', 'paid_amount', 'bal_amt', 'created_by', 'created_date', 'updated_by',
-                   'updated_date', 'others_remarks')
+                   'updated_date', 'status', 'others_remarks')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -293,61 +293,6 @@ class invoices(MyModelView):
         if is_created:
             print("New Data has been added")
 
-
-class paymentHistory(MyModelView):
-
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
-
-    column_display_pk = False
-    column_default_sort = ('invoice_id', True)
-    #form_columns = ['id', 'desc']
-    column_searchable_list = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
-                              'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    column_filters = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
-                      'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    # column_editable_list = ['payment_mode', 'total_amount', 'paid_amount',
-    #                         'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    column_editable_list = ['payment_mode', 'status']
-    can_create = False
-    can_edit = True
-    column_list = ('invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
-                   'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date')
-    can_view_details = True
-    page_size = 50
-    create_modal = True
-    edit_modal = True
-    can_export = True
-
-    @property
-    def can_delete(self):
-        if (current_user.has_role('superuser')):
-            return True
-        return False
-    
-    def after_model_change(self, form, model, is_created):
-        if not is_created:
-            invoice_id_edited = model.invoice_id
-            c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            updated_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
-            paymentDb = db.session.query(payment_history).filter_by(
-                invoice_id=invoice_id_edited).first()
-            if (paymentDb is not None):
-                if(paymentDb.status != 0):
-                    paymentDb.payment_collected_by = current_user.username
-                    paymentDb.payment_collected_date = updated_date
-            else:
-                print("An Error has occured")
-            db.session.commit()
-            print("Data has been edited")
-            # refresh code
-            pyautogui.hotkey('f5')
-        if is_created:
-            print("New Data has been added")
 ######################################################################################################
 
 
@@ -596,23 +541,6 @@ class invoice(db.Model):
 
     def __str__(self):
         return self.grand_total
-    
-    
-class FinalTestView(db.Model):
-    __tablename__ = 'FinalTestView'
-    test_id = db.Column(db.Integer, db.ForeignKey(
-        'analytical_test.test_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
-    sample_id = db.Column(db.Integer, db.ForeignKey(
-        'analytical_test.sample_id'), unique=False)
-    test_name = db.Column(db.String(250), nullable=True)
-    created_date = db.Column(db.DateTime, nullable=True)
-    outcome_result = db.Column(db.String(100), nullable=True)
-    city_name = db.Column(db.String(100), nullable=True)
-    client_name = db.Column(db.String(250), nullable=True)
-    sample_code = db.Column(db.String(100), nullable=True)
-
-    def __repr__(self):
-        return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
 
 
 # class sqlite_sequence(db.Model):
@@ -661,6 +589,80 @@ class testUserView(BaseView):
         clinicalTestData = get_clinicalTest_table_data()
         clinicalTestDatas = json.dumps(clinicalTestData)
         return self.render('admin/usertest.html', speciesData=speciesData, specimenData=specimenData, locationData=locationData, clinicalTestData=clinicalTestDatas, admin_base_template=admin.base_template)
+
+
+
+class analyticalTest(MyModelView):
+
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+    
+    @action('generate_result', 'Generate Resultsheet', 'Are you sure you want to generate an result sheet?')
+    @expose('/generate-result', methods=['POST'])
+    def generate_result(self, ids):
+        # Get the selected records
+        records = analytical_test.query.filter(analytical_test.test_id.in_(ids)).all()
+        
+        # Get the data for the selected records
+        selected_ids = [record.sample_id for record in records]
+        
+        data = analytical_test.query.filter(analytical_test.sample_id.in_(selected_ids)).all()
+        
+        # Create a list of dictionaries with the necessary attributes
+        form_data = []
+        for d in data:
+            
+            sample = sample_stock.query.get(d.sample_id)
+            
+            form_data.append({
+                'sample_id': sample.sample_id,
+                'sample_name': sample.sample_name,
+                'test_name':d.test_name,
+                'outcome_result':d.outcome_result,
+            })
+        r_data=[]
+        species_data={1:"Canine",2:"Feline",3:"Avian"}
+        row_data = sample_stock.query.filter(sample_stock.sample_id.in_(selected_ids)).all()
+        for r in row_data:
+            r_data.append({
+                'date':r.created_date,
+                'customer_name':r.customer_name,
+                'age':r.age,
+                'email':r.email_id,
+                'phno':r.phone_no,
+                'pet_name':r.sample_name,
+                'species':(species_data.get(r.species_id))})
+        # Render the template with the form data
+        return self.render('my_action.html', data=form_data,r_data=r_data)
+    
+    column_display_pk = True
+    column_default_sort = ('test_id', True)
+    #form_columns = ['id', 'desc']
+    column_searchable_list = ['sample_id','status', 'outcome_result', 'test_name']
+    column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
+                      'test_outcome_created_by', 'test_outcome_created_date', 'status']
+    column_editable_list = ['test_name','outcome_result','status']
+    can_create = True
+    can_edit = True
+    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result','status','test_outcome_created_by', 'test_outcome_created_date')
+    can_view_details = True
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    can_export = True
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            # refresh code
+            pyautogui.hotkey('f5')
+        if is_created:
+            pass
+
+
 
 
 def get_species_table_data():
@@ -912,11 +914,6 @@ admin.add_view(ourEmployee(employee, db.session,
                name="Old Employees", category="Employees"))
 
 
-# final table
-admin.add_view(finalTestTableView(FinalTestView, db.session,
-               name="Summary"))
-
-
 ##################################################################################################
 # --------------------------------
 # define a context processor for merging flask-admin's template context
@@ -982,34 +979,7 @@ def build_sample_db():
         db.session.commit()
     return
 
-# def create_finalTestTbale():
-#     resultTest=db.session.query(analytical_test).all()
-#     for eachTest in resultTest:
-#         testId=eachTest.test_id
-#         sample_id=eachTest.sample_id
-#         testName=eachTest.test_name
-#         outcomeResult=eachTest.outcome_result
-#         checkSamplePresent=db.session.query(sample_stock).filter_by(sample_id=sample_id).first()
-#         c_date = '0001-01-01 00:00:01'
-#         defaultDate = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
-#         created_date = defaultDate
-#         clientName = ''
-#         sampleCode = ''
-#         cityCode = ''
-#         if (checkSamplePresent != None):
-#             print(sample_id)
-#             created_date=checkSamplePresent.created_date
-#             clientName = checkSamplePresent.customer_name
-#             sampleCode = checkSamplePresent.sample_code
-#             cityCode = checkSamplePresent.location_id
-#         cityName=''
-#         if(cityCode):
-#             cityName=db.session.query(location).filter_by(location_id=cityCode).first().location_name
-#         finalDb=FinalTestView(test_id=testId,sample_id=sample_id,test_name=testName,created_date=created_date,outcome_result=outcomeResult,city_name=cityName,sample_code=sampleCode,client_name=clientName)
-#         db.session.add(finalDb)
-#     db.session.commit()
 
-    
 # --------------------------------
 # MAIN APP
 # --------------------------------
@@ -1028,5 +998,4 @@ if __name__ == '__main__':
     # sql = "ALTER TABLE invoice ADD CONSTRAINT fk_invoice_sample FOREIGN KEY (sample_id) REFERENCES sample_stock(sample_id) ON DELETE CASCADE;"
     # db.session.execute(sql)
     # db.session.commit()
-    # create_finalTestTbale()
     app.run()
