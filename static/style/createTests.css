@@ -5,12 +5,13 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+/* input[type=number] {
     -moz-appearance: textfield;
-}
+} */
 select{
     cursor: pointer;
 }
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
 .createTestForm {
     background-color: #f4f4f4;
     padding: 25px 10px;
@@ -19,6 +20,7 @@ select{
     flex-wrap: wrap;
     gap: 10px;
     background-color: white;
+    font-family: 'Roboto',sans-serif;
 }
 
 .formDiv {

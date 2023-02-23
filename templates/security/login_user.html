@@ -2,9 +2,117 @@
 {% from "security/_macros.html" import render_field, render_field_with_errors, render_checkbox_field %}
 {% include "security/_messages.html" %}
 {% block body %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Roboto', sans-serif;
+        cursor: context-menu;
+    }
+
+    body {
+        width: 100vw;
+        height: 100vh;
+        background-color: #ffffff;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .navbar{
+        display: none;
+    }
+    .container{
+        margin: 0;
+        padding:0;
+        width: fit-content;
+    }
+
+    .loginBody {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: rgba(0, 0, 0, 0.162) 0px 3px 8px;
+        display: flex;
+        justify-content: center;
+        width: 800px;
+        height: fit-content;
+        align-items: center;
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        margin: 0;
+        background-color: rgb(255, 255, 255);
+    }
+    .loginBody .leftBody {
+        min-width: 400px;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin:0;
+        background-color: transparent;
+    }
+
+    .loginBody .leftBody img {
+        width: 300px;
+    }
+    .loginBody .rightBody{
+        min-width: 400px;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgb(255, 255, 255);
+        flex-direction: column;
+        overflow: hidden;
+        background: rgb(255,225,246);
+        background: linear-gradient(55deg, rgba(255,225,246,1) 29%, rgba(167,217,251,1) 78%);
+    }
+    .loginBody .rightBody h1 {
+        text-align: center;
+        font-size: 40px;
+        font-weight: bolder;
+    }
+
+    .loginBody .rightBody .well {
+        background-image: none;
+        border: none;
+        background-color: #ffffff00;
+        box-shadow: none;
+    }
+
+    .loginBody .rightBody .well form {
+        background-color: transparent;
+        border: none;
+    }
+    .loginBody .rightBody .well form .btn-primary{
+        background-image: none;
+        background-color: rgb(0, 188, 0);
+        border: none;
+        transition: all 0.15s ease-in-out;
+        cursor: pointer;
+    }
+    .loginBody .rightBody .well form .btn-primary:hover{
+        transform: scale(1.1);
+    }
+    .loginBody .rightBody .well form input{
+        cursor: auto;
+    }
+    .loginBody .rightBody .well form input[type='text'],
+    .loginBody .rightBody .well form input[type='password']
+    {
+        width: 300px;
+        background-color: white;
+    }
+</style>
 {{ super() }}
-<div class="row-fluid">
-    <div class="col-sm-8 col-sm-offset-2">
+<div class="loginBody">
+    <div class="leftBody">
+        <img alt="PetBiotech Logo" src="{{ url_for('static', filename='/image/logo12.png') }}">
+    </div>
+    <div class="rightBody">
         <h1>Login</h1>
         <div class="well">
             <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
@@ -19,4 +127,3 @@
     </div>
 </div>
 {% endblock body %}
-

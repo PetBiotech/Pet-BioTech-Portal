@@ -59,18 +59,18 @@ class sampleStock(MyModelView):
             return True
         return False
     column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'customer_name', 'address', 'mobile_no',
-                       'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name')
+                       'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name','created_date')
     column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                                  'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name']
+                                  'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name','created_date']
     column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                          'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name']
-    column_editable_list = ['sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name',
+                          'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name','created_date']
+    column_editable_list = ['sample_code','sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name',
                                 'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_name', 'breed', 'species_name', 'specimen_name']
     # other functions
     column_display_pk = True
     column_default_sort = ('sample_id', True)
     #form_columns = ['id', 'desc']
-    can_create = True
+    # can_create = False
     can_edit = True
     can_view_details = True
     page_size = 50
@@ -79,8 +79,11 @@ class sampleStock(MyModelView):
     can_export = True
     can_delete = True
 
-    form_columns = ('sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address',
-                    'mobile_no', 'phone_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'breed', 'species_id', 'specimen_id')
+    @property
+    def can_create(self):
+        return False
+    form_columns = ('sample_code','sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address',
+                    'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'breed', 'species_id', 'specimen_id')
 
     def on_model_delete(self, model):
         # Delete all related invoices_details
@@ -160,14 +163,7 @@ class invoiceDetails(MyModelView):
     edit_modal = False
     can_export = False
     # Remove invoice_id from form_columns
-    form_columns = ['test_name', 'amount']
-
-    # Set the disabled attribute for invoice_id input field
-    form_widget_args = {
-        'invoice_id': {
-            'disabled': True
-        }
-    }
+    form_columns = ['invoice_id','sample_id','test_name', 'amount']
 
     @property
     def can_delete(self):
@@ -216,10 +212,32 @@ class invoiceDetails(MyModelView):
                 print("An Error has occured")
             db.session.commit()
             print("Data has been edited")
+            
+            # 
         if is_created:
-            print("New Data has been added")
-
-
+            c_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            created_date = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
+            test_id = analytical_test.query.order_by(
+                analytical_test.test_id.desc()).first().test_id+1
+            analytical_testDb = analytical_test(test_id=test_id, test_name=model.test_name, sample_id=model.sample_id,
+                                                outcome_result='null', test_outcome_created_by='', test_outcome_created_date=created_date, status=0)
+            db.session.add(analytical_testDb)
+            sample_stock_details=db.session.query(sample_stock).filter_by(sample_id=model.sample_id).first()
+            customer_name=''
+            cityName=''
+            customer_code=''
+            # sample_stock_details.sample_code
+            # sample_stock_details.customer_name
+            if( sample_stock_details):
+                customer_name = sample_stock_details.customer_name
+                customer_code = sample_stock_details.sample_code
+                if (sample_stock_details.location_id):
+                    cityName=db.session.query(location).filter_by(location_id=sample_stock_details.location_id).first().location_name
+            summaryTableDb = FinalTestView(test_id=test_id, test_name=model.test_name, sample_id=model.sample_id,
+                                               outcome_result='null', client_name=customer_name, sample_code=customer_code, created_date=created_date, city_name=cityName)
+            db.session.add(summaryTableDb)
+            db.session.commit()
+            
 class invoices(MyModelView):
 
     def is_accessible(self):
@@ -247,6 +265,8 @@ class invoices(MyModelView):
     create_modal = True
     edit_modal = True
     can_export = True
+    
+    form_columns = ['gst', 'gst_amount','paid_amount',  'others_amt', 'others_remarks']
 
     def after_model_change(self, form, model, is_created):
         try:
@@ -315,6 +335,8 @@ class paymentHistory(MyModelView):
     edit_modal = True
     can_export = True
 
+    form_columns = ['payment_mode', 'status']
+    
     @property
     def can_delete(self):
         if (current_user.has_role('superuser')):

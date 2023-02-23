@@ -64,66 +64,6 @@ class usernameview(MyModelView):
     column_list = ('id', 'first_name', 'last_name', 'username',
                    'email', 'active', 'roles', 'confirmed_at')
 
-
-class testAdminView(MyModelView):
-
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            if current_user.has_role('user'):
-                self.can_create = False
-                self.can_edit = True
-                self.can_delete = False
-                self.can_export = True
-            else:
-                self.can_create = False
-                self.can_edit = True
-                self.can_delete = True
-                self.can_export = True
-            return True
-        return False
-    column_display_pk = True
-    #form_columns = ['id', 'desc']
-    column_searchable_list = ['id', 'Owner', 'Clinic_ReferralName',
-                              'Mobile', 'Tests', 'Species', 'Location', 'date']
-    column_filters = ['id', 'Owner', 'Clinic_ReferralName',
-                      'Mobile', 'Tests', 'Species', 'Location', 'date']
-    column_editable_list = ['desc']
-    can_create = False
-    can_edit = True
-
-    can_view_details = True
-    page_size = 50
-    create_modal = True
-    edit_modal = True
-    can_export = True
-
-###############################################################################################
-# 1
-# class invoiceDetails(MyModelView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
-
-
-# 2
-# class paymentHistory(MyModelView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
-
-# 3
-
-
 class pickupDetails(MyModelView):
 
     def is_accessible(self):
@@ -155,6 +95,8 @@ class pickupDetails(MyModelView):
         if (current_user.has_role('superuser')):
             return True
         return False
+
+    # form_columns = ['picked_by', 'picked_date', 'remarks']
 
 # 4
 
@@ -194,14 +136,6 @@ class receiveDetails(MyModelView):
 # 5
 
 
-# class sampleStock(MyModelView):
-
-#     # def is_accessible(self):
-#     #     if not current_user.is_active or not current_user.is_authenticated:
-#     #         return False
-#     #     if current_user.has_role('superuser') or current_user.has_role('user'):
-#     #         return True
-#     #     return False
 
 # 6
 
@@ -259,15 +193,6 @@ class Allspecimen(MyModelView):
 
 # 8
 
-
-# class analyticalTest(MyModelView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
 # 9
 
 
@@ -300,16 +225,6 @@ class ourEmployee(MyModelView):
     can_export = True
 
 # 10
-
-
-# class invoices(MyModelView):
-
-#     def is_accessible(self):
-#         if not current_user.is_active or not current_user.is_authenticated:
-#             return False
-#         if current_user.has_role('superuser') or current_user.has_role('user'):
-#             return True
-#         return False
 
 
 # 11
@@ -389,3 +304,4 @@ class finalTestTableView(MyModelView):
     create_modal = True
     edit_modal = False
     can_export = True
+    can_delete=True

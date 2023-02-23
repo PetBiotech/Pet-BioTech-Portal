@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
 }
 
 body {
@@ -98,7 +101,7 @@ body {
 .nav-tabs {
     padding: 10px 0;
     margin: 0;
-    background-color: #303030;
+    background-color: #016adb;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -107,6 +110,7 @@ body {
     gap: 5px;
     position: sticky;
     top: 0;
+    z-index: 10;
 }
 
 /* .nav-tabs>li.active>a{
@@ -188,20 +192,25 @@ body {
 .model-list tr td:first-child {
     min-width: 50px;
 }
+
 .model-list>thead>tr>.col-outcome_remarks {
     min-width: 400px;
 }
+
 .model-list>tbody>tr>.col-outcome_remarks>a {
     white-space: pre-wrap;
 }
+
 .model-list>thead>tr>.col-address {
     min-width: 300px;
 }
+
 .model-list>tbody>tr>td {
     vertical-align: middle;
     text-align: center;
     color: rgb(0, 0, 0);
 }
+
 .pagination {
     margin: auto;
     margin-top: 25px;
