@@ -23,7 +23,7 @@ window.onload = function () {
             result.style.padding = "10px 25px";
         }
         if (result.textContent == 'NULL' || result.textContent == 'null' || result.textContent == 'Null') {
-            result.style.backgroundColor = "#151515";
+            result.style.backgroundColor = "#303030";
             result.style.color = "white";
             result.style.padding = "10px 25px";
         }
@@ -32,12 +32,12 @@ window.onload = function () {
         if (result.textContent.trim() == 'Positive' || result.textContent.trim() == 'positive' || result.textContent.trim() == 'Pos' || result.textContent.trim() == 'pos' || result.textContent == '+' || result.textContent == '+ve') {
             result.style.backgroundColor = "red";
             result.style.color = "white";
-            result.style.padding = "10px 25px";
+            result.style.padding = "5px 15px";
         }
         if (result.textContent.trim() == 'NULL' || result.textContent.trim() == 'null' || result.textContent.trim() == 'Null') {
-            result.style.backgroundColor = "#151515";
+            result.style.backgroundColor = "#303030";
             result.style.color = "white";
-            result.style.padding = "10px 25px";
+            result.style.padding = "5px 15px";
         }
     })
 }

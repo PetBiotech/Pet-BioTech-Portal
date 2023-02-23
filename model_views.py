@@ -325,12 +325,12 @@ class locationViews(MyModelView):
     column_display_pk = True
     column_default_sort = ('location_id', False)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['location_id', 'location_name', 'sflag', 'iflag']
-    column_filters = ['location_id', 'location_name', 'sflag', 'iflag']
-    column_editable_list = ['location_name', 'sflag', 'iflag']
+    column_searchable_list = ['location_id', 'location_name']
+    column_filters = ['location_id', 'location_name']
+    column_editable_list = ['location_name']
     can_create = True
     can_edit = True
-    column_list = ('location_id', 'location_name', 'sflag', 'iflag')
+    column_list = ('location_id', 'location_name')
     can_view_details = True
     page_size = 50
     create_modal = True

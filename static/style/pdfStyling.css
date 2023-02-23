@@ -1,0 +1,98 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    width: 100vw;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin:0;
+    min-height: 100vh;
+}
+
+.generatePdfButton {
+    width: fit-content;
+    margin: auto;
+    padding: 10px 20px;
+    margin-top: 50px;
+    outline: none;
+    border: none;
+    background-color: rgb(0, 202, 0);
+    color:white;
+    border-radius: 5px;
+    transition: all 0.15s  ease-in-out;
+}
+.generatePdfButton:hover{
+    transform: scale(1.05);
+    background-color: rgb(0, 171, 0);
+}
+.pdfBody {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    display: block;
+    position: relative;
+}
+
+.pdfBody .headerBody {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pdfBody .headerBody img {
+    width: 175px;
+}
+
+.pdfBody .userInformation {
+    position: relative;
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: 0.75fr 1fr 0.25fr 0.75fr 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 3px;
+    grid-row-gap: 0px;
+    border:2px solid black;
+    padding:5px 15px;
+}
+.pdfBody .userInformation p{
+    font-size: 10px;
+}
+.pdfBody .testResults{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+.pdfBody .testResults h5{
+    font-weight: bolder;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 10px;
+}
+.pdfBody .remarksBody{
+    width: 100%;
+    margin-top:10px;
+    position: relative;
+}
+.pdfBody .remarksBody h6{
+    font-weight: bolder;
+}
+.pdfBody .remarksBody p {
+    width: 100%;
+    text-align: justify;
+}
+footer{
+    position: relative;
+    bottom:5px;
+    width: 100%;
+    text-align: center;
+    color:#303030;
+}

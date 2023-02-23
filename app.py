@@ -59,13 +59,13 @@ class sampleStock(MyModelView):
             return True
         return False
     column_list = ('sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'customer_name', 'address', 'mobile_no',
-                       'email_id', 'age', 'gender', 'pincode', 'bread', 'location_name', 'species_name', 'specimen_name')
+                       'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name')
     column_searchable_list = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                                  'email_id', 'age', 'gender', 'pincode', 'bread', 'location_name', 'species_name', 'specimen_name']
+                                  'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name']
     column_filters = ['sample_id', 'sample_code', 'sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address', 'mobile_no',
-                          'email_id', 'age', 'gender', 'pincode', 'bread', 'location_name', 'species_name', 'specimen_name']
+                          'email_id', 'age', 'gender', 'pincode', 'breed', 'location_name', 'species_name', 'specimen_name']
     column_editable_list = ['sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name',
-                                'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_name', 'bread', 'species_name', 'specimen_name']
+                                'address', 'mobile_no', 'email_id', 'age', 'gender', 'pincode', 'location_name', 'breed', 'species_name', 'specimen_name']
     # other functions
     column_display_pk = True
     column_default_sort = ('sample_id', True)
@@ -80,7 +80,7 @@ class sampleStock(MyModelView):
     can_delete = True
 
     form_columns = ('sample_name', 'sample_description', 'outcome_remarks', 'noof_samples', 'customer_name', 'address',
-                    'mobile_no', 'phone_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'bread', 'species_id', 'specimen_id')
+                    'mobile_no', 'phone_no', 'email_id', 'age', 'gender', 'pincode', 'location_id', 'breed', 'species_id', 'specimen_id')
 
     def on_model_delete(self, model):
         # Delete all related invoices_details
@@ -144,15 +144,15 @@ class invoiceDetails(MyModelView):
     column_display_pk = False
     column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['invoice_id', 'test_name', 'amount',
+    column_searchable_list = ['invoice_id', 'sample_id', 'test_name', 'amount',
                                'created_date', 'updated_by', 'updated_date']
-    column_filters = ['invoice_id', 'test_name', 'amount',
+    column_filters = ['invoice_id', 'sample_id', 'test_name', 'amount',
                        'created_date', 'updated_by', 'updated_date']
     can_create = True
     can_edit = True
 
     column_editable_list = ['test_name', 'amount']
-    column_list = ('invoice_id', 'test_name', 'amount',
+    column_list = ('invoice_id','sample_id', 'test_name', 'amount',
                    'created_date', 'updated_by', 'updated_date')
     can_view_details = True
     page_size = 50
@@ -300,14 +300,14 @@ class paymentHistory(MyModelView):
     column_display_pk = False
     column_default_sort = ('invoice_id', True)
     #form_columns = ['id', 'desc']
-    column_searchable_list = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
+    column_searchable_list = ['invoice_id', 'sample_id', 'payment_mode', 'total_amount', 'paid_amount',
                               'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
-    column_filters = ['invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
+    column_filters = ['invoice_id', 'sample_id', 'payment_mode', 'total_amount', 'paid_amount',
                       'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date']
     column_editable_list = ['payment_mode', 'status']
     can_create = False
     can_edit = True
-    column_list = ('invoice_id', 'payment_mode', 'total_amount', 'paid_amount',
+    column_list = ('invoice_id','sample_id', 'payment_mode', 'total_amount', 'paid_amount',
                    'balance_amt', 'status', 'payment_collected_by', 'payment_collected_date')
     can_view_details = True
     page_size = 50
@@ -381,14 +381,34 @@ class analyticalTest(MyModelView):
         row_data = sample_stock.query.filter(
             sample_stock.sample_id.in_(selected_ids)).all()
         for r in row_data:
+            trimDate=str(r.created_date)[:10]
+            speciesName=db.session.query(species).filter_by(species_id=r.species_id).first().species_name
+            email = r.email_id
+            phone = r.phone_no
+            customerName=r.customer_name
+            petName=r.sample_name
+            petAge=r.age
+            if (email == '' or email == 'NA@NA.com' or email==None):
+                email = 'Unavailable'
+            if (str(phone) == '' or phone==None):
+                phone = 'Unavailable'
+            if (speciesName=='' or speciesName==None):
+                speciesName = 'Unavailable'
+            if (customerName == '' or customerName == None):
+                customerName = 'Unavailable'
+            if (petName == '' or petName == None):
+                petName = 'Unavailable'
+            if (petAge == '' or petAge == None):
+                petAge = 'Unavailable'
             r_data.append({
-                'date': r.created_date,
-                'customer_name': r.customer_name,
-                'age': r.age,
-                'email': r.email_id,
-                'phno': r.phone_no,
-                'pet_name': r.sample_name,
-                'species': (species_data.get(r.species_id))})
+                'sample_id':selected_ids,
+                'date': trimDate,
+                'customer_name': customerName,
+                'age': petAge,
+                'email': email,
+                'phno': phone,
+                'pet_name': petName,
+                'species': speciesName})
         # Render the template with the form data
         return self.render('my_action.html', data=form_data, r_data=r_data)
 
@@ -490,6 +510,7 @@ class invoice_details(db.Model):
     invoice_details_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
     invoice_id = db.Column(db.Integer, nullable=True)
+    sample_id = db.Column(db.Integer, nullable=True)
     test_name = db.Column(db.String(200), nullable=True)
     amount = db.Column(db.Integer, nullable=True)
     created_by = db.Column(db.String(100), nullable=True)
@@ -507,6 +528,7 @@ class payment_history(db.Model):
     payment_history_id = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
     invoice_id = db.Column(db.Integer, nullable=True)
+    sample_id = db.Column(db.Integer, nullable=True)
     payment_mode = db.Column(db.String(200), nullable=True)
     total_amount = db.Column(db.Integer, nullable=True)
     paid_amount = db.Column(db.Integer, nullable=True)
@@ -597,7 +619,7 @@ class sample_stock(db.Model):
     gender = db.Column(db.String(25), nullable=True)
     pincode = db.Column(db.Integer, nullable=True)
     location_id = db.Column(db.Integer, nullable=True)
-    bread = db.Column(db.String(100), nullable=True)
+    breed = db.Column(db.String(100), nullable=True)
     # gender = db.Column(db.String(100), nullable=True)
     species_id = db.Column(db.Integer, nullable=True)
     specimen_id = db.Column(db.Integer, nullable=True)
@@ -882,7 +904,7 @@ def process_data(data):
         #
         #
         sampleStockDb = sample_stock(sample_id=sample_id, sample_code=sample_code, sample_name=sample_name, sample_description=sample_description, outcome_remarks=outcome_remarks, noof_samples=no_of_test, customer_name=customer_name, address=address, mobile_no=mobileno, phone_no=phno, email_id=email, created_by=created_by, created_time=created_time, counciler_status=defaultStatus, customer_status=defaultStatus,
-                                     pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, bread=breed, species_id=species_id, specimen_id=sample,species_name=species_name,specimen_name=specimen_name,location_name=city_name)
+                                     pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, breed=breed, species_id=species_id, specimen_id=sample,species_name=species_name,specimen_name=specimen_name,location_name=city_name)
         db.session.add(sampleStockDb)
         invoiceDb = invoice(invoice_id=invoice_id, sample_id=sample_id, total=0, gst=0, gst_amount=0, created_by=created_by, created_date=created_date,
                             updated_by=0, updated_date=defaultDate, paid_amount=0, bal_amt=0, status=0, others_amt=0, others_remarks='', grand_total=0)
@@ -890,7 +912,7 @@ def process_data(data):
         for test in tests:
             test_id += 1
             invoice_detailsDb = invoice_details(invoice_id=invoice_id, test_name=test, amount=0,
-                                                created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate)
+                                                created_by=created_by, created_date=created_date, updated_by='', updated_date=defaultDate,sample_id=sample_id)
             db.session.add(invoice_detailsDb)
             analytical_testDb = analytical_test(test_id=test_id, test_name=test, sample_id=sample_id,
                                                 outcome_result='null', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
@@ -905,7 +927,7 @@ def process_data(data):
                                     remarks='', created_by=created_by, vet_remarks='', vetremarks_updated_by='', vetremarks_updated_date=defaultDate)
         db.session.add(receiveDb)
         paymentDb = payment_history(invoice_id=invoice_id, payment_mode='', total_amount='', paid_amount='',
-                                    balance_amt='', status=0, payment_collected_by='', payment_collected_date=defaultDate)
+                                    balance_amt='', status=0, payment_collected_by='', payment_collected_date=defaultDate,sample_id=sample_id)
         db.session.add(paymentDb)
         db.session.commit()
         return
@@ -1038,51 +1060,15 @@ def build_sample_db():
         db.session.commit()
     return
 
-# def create_finalTestTbale():
-#     resultTest=db.session.query(analytical_test).all()
-#     for eachTest in resultTest:
-#         testId=eachTest.test_id
-#         sample_id=eachTest.sample_id
-#         testName=eachTest.test_name
-#         outcomeResult=eachTest.outcome_result
-#         checkSamplePresent=db.session.query(sample_stock).filter_by(sample_id=sample_id).first()
-#         c_date = '0001-01-01 00:00:01'
-#         defaultDate = datetime.strptime(c_date, '%Y-%m-%d %H:%M:%S')
-#         created_date = defaultDate
-#         clientName = ''
-#         sampleCode = ''
-#         cityCode = ''
-#         if (checkSamplePresent != None):
-#             print(sample_id)
-#             created_date=checkSamplePresent.created_date
-#             clientName = checkSamplePresent.customer_name
-#             sampleCode = checkSamplePresent.sample_code
-#             cityCode = checkSamplePresent.location_id
-#         cityName=''
-#         if(cityCode):
-#             cityName=db.session.query(location).filter_by(location_id=cityCode).first().location_name
-#         finalDb=FinalTestView(test_id=testId,sample_id=sample_id,test_name=testName,created_date=created_date,outcome_result=outcomeResult,city_name=cityName,sample_code=sampleCode,client_name=clientName)
-#         db.session.add(finalDb)
-#     db.session.commit()
-
-
-# def update_location_species_specimen():
-#     resultTest=db.session.query(sample_stock).all()
-#     for eachTest in resultTest:
-#         if(eachTest.location_id):
-#             print(eachTest.sample_id)
-#             eachTest.location_name=db.session.query(location).filter_by(location_id=eachTest.location_id).first().location_name
-#         else:
-#             eachTest.location_name="Unknown"
-#         if(eachTest.species_id):
-#             eachTest.species_name=db.session.query(species).filter_by(species_id=eachTest.species_id).first().species_name
-#         else:
-#             eachTest.species_name = "Unknown"
-#         if (eachTest.specimen_id):
-#             eachTest.specimen_name = db.session.query(specimen).filter_by(specimen_id=eachTest.specimen_id).first().specimen_name
-#         else:
-#             eachTest.specimen_name = "Unknown"
-#     db.session.commit()
+def update_sample_id():
+    resultTest=db.session.query(invoice).all()
+    for eachTest in resultTest:
+        if(eachTest.invoice_id):
+            print(eachTest.sample_id)
+            in_det=db.session.query(payment_history).filter_by(invoice_id=eachTest.invoice_id).all()
+            for iDetails in in_det:
+                iDetails.sample_id=eachTest.sample_id
+    db.session.commit()
 # --------------------------------
 # MAIN APP
 # --------------------------------
@@ -1101,6 +1087,4 @@ if __name__ == '__main__':
     # sql = "ALTER TABLE invoice ADD CONSTRAINT fk_invoice_sample FOREIGN KEY (sample_id) REFERENCES sample_stock(sample_id) ON DELETE CASCADE;"
     # db.session.execute(sql)
     # db.session.commit()
-    # create_finalTestTbale()
-    # update_location_species_specimen()
     app.run()

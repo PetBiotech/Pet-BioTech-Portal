@@ -4,8 +4,8 @@
 <form method="POST" class="form-horizontal createTestForm" id="createTestForm" autocomplete="off">
   <div class="leftForm formDiv">
     <div class="form-group">
-      <label for="sampleCode" class="control-label col-xs-4">Sample Code <span
-          style="color: red; font-size: 16px;">*</span></label>
+      <!-- <span style="color: red; font-size: 16px;">*</span> -->
+      <label for="sampleCode" class="control-label col-xs-4">Sample Code </label>
       <div class="col-xs-8">
         <input id="sampleCode" name="sampleCode" type="text" required="required" class="form-control">
       </div>
@@ -52,12 +52,12 @@
           style="cursor: pointer;">Others</label>
       </div>
     </div>
-    <div class="form-group">
+    <!-- <div class="form-group">
       <label for="age" class="control-label col-xs-4">Age</label>
       <div class="col-xs-8">
         <input id="age" name="age" placeholder="Pet's Age" type="text" class="form-control">
       </div>
-    </div>
+    </div> -->
     <div class="form-group" style="display:none">
       <label for="number" class="control-label col-xs-4">No of tests </label>
       <div class="col-xs-8">
@@ -76,6 +76,13 @@
 
    -->
   <div class="middleForm formDiv">
+    <!-- Age -->
+    <div class="form-group">
+      <label for="age" class="control-label col-xs-2">Age</label>
+      <div class="col-xs-10">
+        <input id="age" name="age" placeholder="Pet's Age" type="text" class="form-control">
+      </div>
+    </div>
     <!-- species -->
     <div class="form-group">
       <p class="col-xs-12" style="font-weight: bolder;">Species</p>

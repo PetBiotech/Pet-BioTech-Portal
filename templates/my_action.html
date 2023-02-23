@@ -4,74 +4,99 @@
 {{ super() }}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style/pdfStyling.css') }}">
 {% endblock %}
 
 {% block body %}
 {{ super() }}
+<button  onclick="createPDF('{{ data.sample_id }}')" class="generatePdfButton">Generate PDF</button>
+<div id="content" class="pdfBody">
+    <div class="headerBody">
+        <img src="{{ url_for('static', filename='image/logo12.png') }}" alt="logo">
 
-<div id="content">
-<div style="float: left;">
-<img src="{{ url_for('static', filename='image/logo12.png') }}" alt="logo" style="float:left;width:17%;">
-</div>
+        <h1 style="color:#00b7ff;"><span style="color:#001975;">P</span>et<span style="color:#001975;">B</span>iotech
+        </h1>
+    </div>
 
-<div style="float: right; position: relative;">
-<h1 style="color:#00b7ff;"><span style="color:#001975;">P</span>et<span style="color:#001975;">B</span>iotech</h1>
-</div>
+    {% for r in r_data %}
+    <div class="userInformation">
+        <p style="font-weight:bolder;">Date: </p>
+        <p>{{ r.date }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Ref No: </p>
+        <p>{{ r.sample_id[0] }}</p>
+        <p style="font-weight:bolder;">Client name: </p>
+        <p>{{ r.customer_name }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Pet Name: </p>
+        <p>{{ r.pet_name }}</p>
+        <p style="font-weight:bolder;">Email: </p>
+        <p>{{ r.email }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Ph no: </p>
+        <p>{{ r.phno }}</p>
+        <p style="font-weight:bolder;">Pet Age: </p>
+        <p>{{ r.age }}</p>
+        <p></p>
+        <p style="font-weight:bolder;">Species: </p>
+        <p>{{ r.species }}</p>
+    </div>
+    {% endfor %}
 
-{% for r in r_data %}
-<div style="float:left; width:50%;">
-    <p>Date: {{ r.date }}</p>
-    <p>Customer name: {{ r.customer_name }}</p>
-    <p>Pet Age: {{ r.age }} </p>
-</div>
-<div style="float:right; width:50%;">
-    <p>Email: {{ r.email }}</p>
-    <p>Phone Number: {{ r.phno }}</p>
-    <p>Pet Name: {{ r.pet_name }}</p>
-    <p>Species: {{ r.species }}</p>
-</div>
-{% endfor %}
-
-<div display="block">
-    <h2>Test Results</h2>
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>Sample ID</th>
-                <th>Sample Name</th>
-                <th>Test Name</th>
-                <th>Result</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in data %}
+    <div class="testResults">
+        <h5>Test Results</h5>
+        <table class="table table-striped table-bordered">
+            <thead>
                 <tr>
-                    <td>{{ record.sample_id }}</td>
-                    <td>{{ record.sample_name }}</td>
+                    <th>Test No</th>
+                    <!-- <th>Sample Name</th> -->
+                    <th>Test Name</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in data %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <!-- <td>{{ record.sample_name }}</td> -->
                     <td>{{ record.test_name }}</td>
                     <td>{{ record.outcome_result }}</td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="remarksBody">
+        {% if r_data.remarks %}
+            <h6>Remarks : </h6>
+            <p>{{ r_data.remarks }}</p>
+        {% endif %}
+    </div>
+    <footer>End of Report</footer>
 </div>
-</div>
-
-<button onclick="createPDF()">Generate PDF</button>
 
 <script>
-        function createPDF() {
-            var pdf = document.getElementById("content");
-            var opt = {
-                margin: 1,
-                filename: 'result.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(pdf).save();
-            console.log('please work')
-        }
-    </script>
+    function createPDF(name) {
+        var pdf = document.getElementById("content");
+        fileName='result_'+name+'.pdf';
+        var opt = {
+            margin: 1,
+            filename: fileName,
+            image: {
+                type: 'jpeg',
+                quality: 1
+            },
+            html2canvas: {
+                scale: 1.1
+            },
+            jsPDF: {
+                unit: 'cm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        };
+        html2pdf().set(opt).from(pdf).save();
+    }
+</script>
 
 {% endblock %}
