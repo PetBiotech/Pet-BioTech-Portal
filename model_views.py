@@ -251,6 +251,7 @@ class locationViews(MyModelView):
     create_modal = True
     edit_modal = True
     can_export = True
+    form_columns = ['location_name']
 
 
 # 12
