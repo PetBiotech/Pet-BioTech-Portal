@@ -1,7 +1,7 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 <link rel="stylesheet" href="{{ url_for('static',filename='style/createTests.css') }}">
-<form method="POST" class="form-horizontal createTestForm" id="createTestForm" autocomplete="off">
+<form method="POST" class="form-horizontal createTestForm" id="createTestForm" autocomplete="off" onsubmit="formReset()">
   <div class="leftForm formDiv">
     <div class="form-group">
       <!-- <span style="color: red; font-size: 16px;">*</span> -->
@@ -87,11 +87,17 @@
     <div class="form-group">
       <p class="col-xs-12" style="font-weight: bolder;">Species</p>
       <div class="col-xs-12">
-        <select id="species" name="species" required="required" class="select form-control">
+        <select id="species" name="species" required="required" class="select form-control" onchange="newSpecies()">
           {% for row in speciesData %}
-          <option value="{{ row[0] }}">{{ row[1] }}</option>
+          <option value="{{ row[1] }}">{{ row[1] }}</option>
           {% endfor %}
         </select>
+      </div>
+    </div>
+    <div class="form-group" id="otherSpeciesInput" style="display:none;">
+      <label for="otherSpecies" class="control-label col-xs-12" style="text-align: left;color:rgb(0, 94, 255);">Other Species </label>
+      <div class="col-xs-12">
+        <input id="otherSpecies" name="otherSpecies" placeholder="Other Species" type="text" class="form-control">
       </div>
     </div>
     <!-- specimens -->
@@ -99,11 +105,18 @@
       <p class="col-xs-12" style="font-weight: bolder;">Specimens</p>
       <div class="col-xs-12">
         <select id="sample" name="sample" required="required" class="select form-control"
-          aria-describedby="sampleHelpBlock">
+          aria-describedby="sampleHelpBlock" onclick="newSpecimen()">
           {% for row in specimenData %}
-          <option value="{{ row[0] }}">{{ row[1] }}</option>
+          <option value="{{ row[1] }}">{{ row[1] }}</option>
           {% endfor %}
         </select>
+      </div>
+    </div>
+    <div class="form-group" id="otherSpecimenInput" style="display:none;">
+      <label for="otherSpecimen" class="control-label col-xs-12" style="text-align: left;color:rgb(0, 94, 255);">Other
+        Specimens </label>
+      <div class="col-xs-12">
+        <input id="otherSpecimen" name="otherSpecimen" placeholder="Other Species" type="text" class="form-control">
       </div>
     </div>
     <!-- 
@@ -141,8 +154,7 @@
     <div class="form-group">
       <label for="state" class="control-label col-xs-4">State</label>
       <div class="col-xs-8">
-        <select id="state" name="state" class="select form-control" required="required">
-          <option value="Other" selected>Other</option>
+        <select id="state" name="state" class="select form-control" required="required" onchange="checkState()">
           <option value="Andhra Pradesh">Andhra Pradesh</option>
           <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
           <option value="Arunachal Pradesh">Arunachal Pradesh</option>
@@ -161,7 +173,7 @@
           <option value="Himachal Pradesh">Himachal Pradesh</option>
           <option value="Jammu and Kashmir">Jammu and Kashmir</option>
           <option value="Jharkhand">Jharkhand</option>
-          <option value="Karnataka">Karnataka</option>
+          <option value="Karnataka" selected>Karnataka</option>
           <option value="Kerala">Kerala</option>
           <option value="Madhya Pradesh">Madhya Pradesh</option>
           <option value="Maharashtra">Maharashtra</option>
@@ -185,12 +197,19 @@
     <div class="form-group">
       <label for="city" class="control-label col-xs-4">City </label>
       <div class="col-xs-8">
-        <select id="city" name="city" required="required" class="select form-control"
-          aria-describedby="sampleHelpBlock">
+        <select id="city" name="city" required="required" class="select form-control" aria-describedby="sampleHelpBlock"
+          onchange="checkCity()">
           {% for row in locationData %}
-          <option value="{{ row[0] }}">{{ row[1] }}</option>
+          <option value="{{ row[1] }}">{{ row[1] }}</option>
           {% endfor %}
         </select>
+      </div>
+    </div>
+    <div class="form-group" id="otherCityInput" style="display:none;">
+      <label for="otherCity" class="control-label col-xs-4" style="color:rgb(0, 94, 255);">Other City
+      </label>
+      <div class="col-xs-8">
+        <input id="otherCity" name="otherCity" placeholder="Other City" type="text" class="form-control">
       </div>
     </div>
     <div class="form-group">
@@ -363,5 +382,41 @@
       });
     });
   });
+
+  function checkCity() {
+    let selectedState = document.getElementById("city");
+    selectedStateValue = selectedState.options[selectedState.selectedIndex].value;
+    if (selectedStateValue != "Other") {
+      document.getElementById("otherCityInput").style.display = "none";
+    } else {
+      document.getElementById("otherCityInput").style.display = "block";
+    }
+  }
+
+  function newSpecies(){
+    let selectedState = document.getElementById("species");
+    selectedStateValue = selectedState.options[selectedState.selectedIndex].value;
+    if (selectedStateValue == "Other") {
+      document.getElementById("otherSpeciesInput").style.display = "block";
+    } else {
+      document.getElementById("otherSpeciesInput").style.display = "none";
+    }
+  }
+
+  function newSpecimen(){
+    let selectedState = document.getElementById("sample");
+    selectedStateValue = selectedState.options[selectedState.selectedIndex].value;
+    if (selectedStateValue == "Other") {
+      document.getElementById("otherSpecimenInput").style.display = "block";
+    } else {
+      document.getElementById("otherSpecimenInput").style.display = "none";
+    }
+  }
+
+  function formReset(){
+    document.getElementById("otherCityInput").style.display = "none";
+    document.getElementById("otherSpeciesInput").style.display = "none";
+    document.getElementById("otherSpecimenInput").style.display = "none";
+  }
 </script>
 {% endblock body %}

@@ -879,29 +879,61 @@ def process_data(data):
         #
         state = data['state']
         city = data['city']
+        OtherCity = data['otherCity']
+        if(OtherCity==''):
+            OtherCity='None'
+        if(city=='Other' and OtherCity!='None'):
+            otherOptionBelow = location.query.order_by(location.location_id.desc()).first()
+            otherOptionBelow.location_name=OtherCity
+            newCity = location(location_name='Other')
+            db.session.add(newCity)
+            db.session.commit()
+            city=OtherCity
+        city_code = location.query.order_by(location.location_id.desc()).first()
         address = data['address']
         pincode = data['pincode']
         phno = data['phno']
         mobileno = phno
         email = data['email']
-        city_name=''
-        if(int(city) >=1 ):
-            city_name=db.session.query(location).filter_by(location_id=city).first().location_name
-        address += "\n"+city_name+" - "+pincode+"\n"+state
+        if(city != '' ):
+            city_code=db.session.query(location).filter_by(location_name=city).first().location_id
+        address += "\n"+city+" - "+pincode+"\n"+state
         #
         #
         # Test Details
         #
         #
-        species_id = data['species']
-        species_name=''
-        if( int(species_id) >=1 ):
-            species_name = db.session.query(species).filter_by(
-                species_id=species_id).first().species_name
+        species_name = data['species']
+        OtherSpecies=data['otherSpecies']
+        if(OtherSpecies==''):
+            OtherSpecies = 'None'
+        if (species_name == 'Other' and OtherSpecies != 'None'):
+            otherOptionBelow = species.query.order_by(species.species_id.desc()).first()
+            otherOptionBelow.species_name = OtherSpecies
+            newSpecies= species(species_name='Other')
+            db.session.add(newSpecies)
+            db.session.commit()
+            species_name = OtherSpecies
+        species_id = species.query.order_by(species.species_id.desc()).first()
+        if (species_name != ''):
+            species_id = db.session.query(species).filter_by(species_name=species_name).first().species_id
+        #
+        # 
+        # Sample
         sample = data['sample']
-        specimen_name = ''
-        if (int(sample) >= 1):
-            specimen_name = db.session.query(specimen).filter_by(specimen_id=sample).first().specimen_name
+        OtherSample=data['otherSpecimen']
+        if(OtherSample==''):
+            OtherSample = 'None'
+        if (sample == 'Other' and OtherSample!='None'):
+            otherOptionBelow = specimen.query.order_by(specimen.specimen_id.desc()).first()
+            otherOptionBelow.specimen_name = OtherSample
+            newSpecimen = specimen(specimen_name='Other')
+            db.session.add(newSpecimen)
+            db.session.commit()
+            sample = OtherSample
+        specimen_id = specimen.query.order_by(specimen.specimen_id.desc()).first()
+        if (sample != ''):
+            specimen_id = db.session.query(specimen).filter_by(specimen_name=sample).first().specimen_id
         tests = request.form.getlist('selectTest')
         outcome_remarks = ''
         i = 1
@@ -926,7 +958,7 @@ def process_data(data):
         #
         #
         sampleStockDb = sample_stock(sample_id=sample_id, sample_code=sample_code, sample_name=sample_name, sample_description=sample_description, outcome_remarks=outcome_remarks, noof_samples=no_of_test, customer_name=customer_name, address=address, mobile_no=mobileno, phone_no=phno, email_id=email, created_by=created_by, created_time=created_time, counciler_status=defaultStatus, customer_status=defaultStatus,
-                                     pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city, breed=breed, species_id=species_id, specimen_id=sample,species_name=species_name,specimen_name=specimen_name,location_name=city_name)
+                                     pickup_status=defaultStatus, created_date=created_date, total_sample_price='', price_unit='', customer_accepted_by='', customer_accepted_date=defaultDate, result_upload_status=0, pickup_accepted_status=0, receive_accepted_status=0, invoice_status=0, updated_by='', updated_date=defaultDate, age=age, gender=gender, pincode=pincode, location_id=city_code, breed=breed, species_id=species_id, specimen_id=specimen_id, species_name=species_name, specimen_name=sample, location_name=city)
         db.session.add(sampleStockDb)
         invoiceDb = invoice(invoice_id=invoice_id, sample_id=sample_id, total=0, gst=0, gst_amount=0, created_by=created_by, created_date=created_date,
                             updated_by=0, updated_date=defaultDate, paid_amount=0, bal_amt=0, status=0, others_amt=0, others_remarks='', grand_total=0)
@@ -940,7 +972,7 @@ def process_data(data):
                                                 outcome_result='null', test_outcome_created_by='', test_outcome_created_date=defaultDate, status=0)
             db.session.add(analytical_testDb)
             summaryTableDb = FinalTestView(test_id=test_id, test_name=test, sample_id=sample_id,
-                                           outcome_result='null', client_name=customer_name, sample_code=sample_code, created_date=created_date, city_name=city_name)
+                                           outcome_result='null', client_name=customer_name, sample_code=sample_code, created_date=created_date, city_name=city)
             db.session.add(summaryTableDb)
         pickupDb = pickup_details(sample_id=sample_id, picked_by='', picked_date=defaultDate,
                                   remarks='', created_by=created_by)
