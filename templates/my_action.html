@@ -9,7 +9,9 @@
 
 {% block body %}
 {{ super() }}
-<button  onclick="createPDF('{{ data.sample_id }}')" class="generatePdfButton">Generate PDF</button>
+{% for d in r_data %}
+<button  onclick="createPDF({{ d.sample_id }})" class="generatePdfButton">Generate PDF</button>
+{% endfor %}
 <div id="content" class="pdfBody">
     <div class="headerBody">
         <img src="{{ url_for('static', filename='image/logo12.png') }}" alt="logo">
@@ -77,17 +79,17 @@
 
 <script>
     function createPDF(name) {
+        
         var pdf = document.getElementById("content");
-        fileName='result_'+name+'.pdf';
         var opt = {
             margin: 1,
-            filename: fileName,
+            filename: 'result_'+name+'.pdf',
             image: {
                 type: 'jpeg',
                 quality: 1
             },
             html2canvas: {
-                scale: 1.1
+                scale: 3
             },
             jsPDF: {
                 unit: 'cm',
@@ -96,6 +98,7 @@
             }
         };
         html2pdf().set(opt).from(pdf).save();
+        
     }
 </script>
 
