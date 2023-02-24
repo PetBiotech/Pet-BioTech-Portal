@@ -1,56 +1,16 @@
 {% extends 'admin/master.html' %}
 {% block body %}
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    body {
-        width: 100vw;
-        height: 100vh;
-        background-color: #ececec;
-        /* display: flex; */
-        justify-content: center;
-        align-items: center;
-    }
-
-    p {
-        cursor: context-menu;
-    }
-
-    .containerBody {
-        margin: auto;
-        min-width: 700px;
-        max-width: fit-content;
-        height: fit-content;
-        padding: 30px;
-        background-color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-        border-radius: 15px;
-    }
-
-    .containerBody img {
-        width: 300px;
-    }
-
-    .containerBody .loginTab {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='style/home.css') }}">
 {{ super() }}
 {% if not current_user.is_authenticated %}
+<style>
+    body{
+        background: linear-gradient(132deg, rgb(65, 80, 95) 0.00%, rgb(36, 37, 38) 100.00%);
+    }
+    .navbar-nav li:first-child{
+        display: block;
+        }
+</style>
 <div class="containerBody">
     <img alt="PetBiotech logo" src="{{ url_for('static', filename='image/logo12.png') }}">
     <p>This is a confidential site.</p>
@@ -66,6 +26,9 @@
     document.querySelector('body').style.display = "flex";
 </script>
 {% else %}
-<h1>Test Name</h1>
+<a href="/admin/dashboard" id="button" style="display: none;"></a>
+<script>
+    document.getElementById("button").click();
+</script>
 {% endif %}
 {% endblock body %}

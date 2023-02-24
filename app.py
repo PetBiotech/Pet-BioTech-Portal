@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+from flask import Flask, jsonify, render_template
 import json
 from wtforms import SelectField
 from flask_wtf import FlaskForm
@@ -8,7 +11,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask import Flask, jsonify, request, session
 from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from model_views import (
-    finalTestTableView,MyModelView, usernameview, pickupDetails,
+    dashboardView,finalTestTableView,MyModelView, usernameview, pickupDetails,
     receiveDetails, Allspecies, Allspecimen, ourEmployee, locationViews, clinicalTestViews
 )
 import pyautogui
@@ -385,26 +388,39 @@ class analyticalTest(MyModelView):
 
         data = analytical_test.query.filter(
             analytical_test.sample_id.in_(selected_ids)).all()
-
+        dataCount=analytical_test.query.filter(
+            analytical_test.sample_id.in_(selected_ids)).count()
         # Create a list of dictionaries with the necessary attributes
         form_data = []
+        showRemarks="False"
+        allRemarks = [[]]*dataCount
+        t=0
         for d in data:
-
             sample = sample_stock.query.get(d.sample_id)
-
+            allRemarks[t]=d.remarks  
+            t+=1          
             form_data.append({
                 'sample_id': sample.sample_id,
-                'sample_name': sample.sample_name,
+                'remarks': d.remarks,
                 'test_name': d.test_name,
                 'outcome_result': d.outcome_result,
             })
+        for i in allRemarks:
+            if(i):
+                showRemarks="True"
+        remarkData=({
+            'showRemark':showRemarks,
+            'remarks':allRemarks
+        })
         r_data = []
-        species_data = {1: "Canine", 2: "Feline", 3: "Avian"}
         row_data = sample_stock.query.filter(
             sample_stock.sample_id.in_(selected_ids)).all()
         for r in row_data:
             trimDate=str(r.created_date)[:10]
-            speciesName=db.session.query(species).filter_by(species_id=r.species_id).first().species_name
+            speciesName='Unavailable'
+            speciesNameCheck=db.session.query(species).filter_by(species_id=r.species_id).first()
+            if (speciesNameCheck != None):
+                speciesName = speciesNameCheck.species_name
             email = r.email_id
             phone = r.phone_no
             customerName=r.customer_name
@@ -432,7 +448,7 @@ class analyticalTest(MyModelView):
                 'pet_name': petName,
                 'species': speciesName})
         # Render the template with the form data
-        return self.render('my_action.html', data=form_data, r_data=r_data)
+        return self.render('my_action.html', data=form_data, r_data=r_data, remarkData=remarkData)
 
     column_display_pk = True
     column_default_sort = ('test_id', True)
@@ -440,12 +456,11 @@ class analyticalTest(MyModelView):
     column_searchable_list = ['sample_id',
                               'status', 'outcome_result', 'test_name']
     column_filters = ['test_id', 'test_name', 'sample_id', 'outcome_result',
-                      'test_outcome_created_by', 'test_outcome_created_date', 'status']
-    column_editable_list = ['test_name', 'outcome_result', 'status']
+                      'remarks', 'status']
+    column_editable_list = ['test_name', 'outcome_result', 'remarks','status']
     can_create = True
     can_edit = True
-    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result',
-                    'test_outcome_created_by', 'test_outcome_created_date')
+    column_list = ('test_id', 'sample_id', 'test_name', 'outcome_result','remarks')
     can_view_details = True
     page_size = 50
     create_modal = True
@@ -690,6 +705,7 @@ class analytical_test(db.Model):
     test_outcome_created_by = db.Column(db.String(100), nullable=True)
     test_outcome_created_date = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.Integer, nullable=True)
+    remarks=db.Column(db.String(1000),nullable=True)
 
 
 class employee(db.Model):
@@ -757,6 +773,7 @@ class FinalTestView(db.Model):
 # --------------------------------
 # FLASK VIEWS / ROUTES
 # --------------------------------
+
 
 @app.route('/')
 def index():
@@ -952,6 +969,7 @@ def process_data(data):
             invoice.invoice_id.desc()).first().invoice_id+1
         test_id = analytical_test.query.order_by(
             analytical_test.test_id.desc()).first().test_id
+        sample_code = sample_code.upper()+"/" + str(created_date)[2:4] + "/" + str(created_date)[5:7]+"/"+str(sample_id)
         #
         #
         # Storing in Database
@@ -999,9 +1017,33 @@ admin = flask_admin.Admin(
     template_mode='bootstrap3',
 )
 
+
+class dashboardView(BaseView):
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+
+    @expose('/')
+    def index(self):
+        dashBoardCountData=[]
+        totalTests = analytical_test.query.count()
+        totalOrders= sample_stock.query.count()
+        positiveResults = analytical_test.query.filter_by(outcome_result="Positive").count()
+        positiveResults += analytical_test.query.filter_by(outcome_result="positive").count()
+        dashBoardCountData={
+            'totalTests':totalTests,
+            'totalOrders':totalOrders,
+            'positiveResults':positiveResults
+        }
+        return self.render('admin/dashboard.html', dashBoardCountData=dashBoardCountData)
+
 ########################################### Admin vies for the database table#######################################################
 # visible only for admin
-
+admin.add_view(dashboardView(name="Dashboard",
+               endpoint='dashboard'))
 # orders
 admin.add_view(testUserView(name="Create Order",
                endpoint='usertest'))
@@ -1123,6 +1165,29 @@ def update_sample_id():
             for iDetails in in_det:
                 iDetails.sample_id=eachTest.sample_id
     db.session.commit()
+    
+    
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# Dashboard
+# 
+# 
+# 
+# 
+# 
+#
+#
+#
+
+
 # --------------------------------
 # MAIN APP
 # --------------------------------

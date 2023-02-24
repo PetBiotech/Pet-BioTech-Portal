@@ -1,13 +1,15 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 <link rel="stylesheet" href="{{ url_for('static',filename='style/createTests.css') }}">
-<form method="POST" class="form-horizontal createTestForm" id="createTestForm" autocomplete="off" onsubmit="formReset()">
+<form method="POST" class="form-horizontal createTestForm" id="createTestForm" autocomplete="off"
+  onsubmit="formReset()">
   <div class="leftForm formDiv">
     <div class="form-group">
       <!-- <span style="color: red; font-size: 16px;">*</span> -->
       <label for="sampleCode" class="control-label col-xs-4">Sample Code </label>
       <div class="col-xs-8">
-        <input id="sampleCode" name="sampleCode" type="text" required="required" class="form-control">
+        <input id="sampleCode" name="sampleCode" placeholder="Sample Code" type="text" required="required"
+          class="form-control">
       </div>
     </div>
     <div class="form-group">
@@ -95,7 +97,8 @@
       </div>
     </div>
     <div class="form-group" id="otherSpeciesInput" style="display:none;">
-      <label for="otherSpecies" class="control-label col-xs-12" style="text-align: left;color:rgb(0, 94, 255);">Other Species </label>
+      <label for="otherSpecies" class="control-label col-xs-12" style="text-align: left;color:rgb(0, 94, 255);">Other
+        Species </label>
       <div class="col-xs-12">
         <input id="otherSpecies" name="otherSpecies" placeholder="Other Species" type="text" class="form-control">
       </div>
@@ -340,6 +343,7 @@
 
   function closeFormModal() {
     $('#formSubmittedModal').modal('hide');
+    location.reload();
   }
 
   function resetDynamicTest() {
@@ -393,7 +397,7 @@
     }
   }
 
-  function newSpecies(){
+  function newSpecies() {
     let selectedState = document.getElementById("species");
     selectedStateValue = selectedState.options[selectedState.selectedIndex].value;
     if (selectedStateValue == "Other") {
@@ -403,7 +407,7 @@
     }
   }
 
-  function newSpecimen(){
+  function newSpecimen() {
     let selectedState = document.getElementById("sample");
     selectedStateValue = selectedState.options[selectedState.selectedIndex].value;
     if (selectedStateValue == "Other") {
@@ -413,7 +417,7 @@
     }
   }
 
-  function formReset(){
+  function formReset() {
     document.getElementById("otherCityInput").style.display = "none";
     document.getElementById("otherSpeciesInput").style.display = "none";
     document.getElementById("otherSpecimenInput").style.display = "none";

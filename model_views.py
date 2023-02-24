@@ -63,6 +63,19 @@ class usernameview(MyModelView):
 
     column_list = ('id', 'first_name', 'last_name', 'username',
                    'email', 'active', 'roles', 'confirmed_at')
+    
+
+class dashboardView(BaseView):
+    def is_accessible(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('superuser') or current_user.has_role('user'):
+            return True
+        return False
+    
+    @expose('/')
+    def index(self):
+        return self.render('admin/dashboard.html')
 
 class pickupDetails(MyModelView):
 

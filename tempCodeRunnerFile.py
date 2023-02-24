@@ -1,1 +1,1 @@
-specimen_id
+dashboardView

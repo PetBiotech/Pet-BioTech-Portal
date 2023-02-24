@@ -17,6 +17,8 @@
         width: 100vw;
         height: 100vh;
         background-color: #ffffff;
+        background: rgb(255,225,246);
+        background: linear-gradient(55deg, rgba(255,225,246,1) 29%, rgba(167,217,251,1) 78%);
         overflow: hidden;
         display: flex;
         justify-content: center;
@@ -59,6 +61,8 @@
         width: 300px;
     }
     .loginBody .rightBody{
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
         min-width: 400px;
         height: 100%;
         display: flex;
@@ -67,10 +71,12 @@
         background-color: rgb(255, 255, 255);
         flex-direction: column;
         overflow: hidden;
-        background: rgb(255,225,246);
-        background: linear-gradient(55deg, rgba(255,225,246,1) 29%, rgba(167,217,251,1) 78%);
+        /* background: rgb(255,225,246);
+        background: linear-gradient(55deg, rgba(255,225,246,1) 29%, rgba(167,217,251,1) 78%); */
+        background-color: #151515;
     }
     .loginBody .rightBody h1 {
+        color: white;
         text-align: center;
         font-size: 40px;
         font-weight: bolder;
@@ -86,6 +92,7 @@
     .loginBody .rightBody .well form {
         background-color: transparent;
         border: none;
+        color:white;
     }
     .loginBody .rightBody .well form .btn-primary{
         background-image: none;

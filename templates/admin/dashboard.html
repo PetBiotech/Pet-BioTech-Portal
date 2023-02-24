@@ -1,0 +1,50 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/home.css') }}">
+{{ super() }}
+{% if not current_user.is_authenticated %}
+<div>User Not is not authenticated</div>
+{% else %}
+<style>
+    body {
+        background-color: #ffffff;
+    }
+</style>
+<div class="dashboard">
+    <div class="leftDashboard">
+        <div class="dashBoardNavbar">
+            <button onclick="showGraph(1)">Order History</button>
+            <button onclick="showGraph(2)">Location statistics</button>
+            <button onclick="showGraph(3)">Tests statistics</button>
+        </div>
+        <div class="graphBody graphBody1" id="graphBody1">1</div>
+        <div class="graphBody graphBody2" id="graphBody2">2</div>
+        <div class="graphBody graphBody3" id="graphBody3">3</div>
+    </div>
+    <div class="centerDivider">.</div>
+    <div class="rightDashboard">
+        <div class="cards card1">
+            <button class="numberCount">{{ dashBoardCountData['totalOrders'] }} +</button>
+            <p class="title">Orders</p>
+        </div>
+        <div class="cards card2">
+            <button class="numberCount">{{ dashBoardCountData['totalTests'] }} +</button>
+            <p class="title">Tests</p>
+        </div>
+        <div class="cards card3">
+            <button class="numberCount">{{ dashBoardCountData['positiveResults'] }} +</button>
+            <p class="title">Positive Tests</p>
+        </div>
+    </div>
+</div>
+<script>
+    const showGraph=(n)=>{
+        let graphBlock=document.querySelectorAll(".graphBody");
+        graphBlock.forEach(element => {
+            element.style.display="none";
+        });
+        document.getElementById("graphBody"+n).style.display="flex";
+    }
+</script>
+{% endif %}
+{% endblock body %}

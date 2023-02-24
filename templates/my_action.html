@@ -69,9 +69,17 @@
         </table>
     </div>
     <div class="remarksBody">
-        {% if r_data.remarks %}
+        {% if remarkData.showRemark == "True" %}
             <h6>Remarks : </h6>
-            <p>{{ r_data.remarks }}</p>
+            <ul type="none">
+                {% for record in remarkData.remarks %}
+                    {% if record %}
+                        <li>
+                            <p>Test {{ loop.index }} : {{ record }}</p>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
         {% endif %}
     </div>
     <footer>End of Report</footer>
