@@ -20,7 +20,7 @@ _default_field_labels = {
     'first_name': 'First Name',
     'last_name': 'Last Name',
     'email': 'E-mail',
-    'password': 'New Password',
+    'password': 'Password',
     'password_repeat': 'Repeat the new password',
     'submit_register': 'Register'
 }
