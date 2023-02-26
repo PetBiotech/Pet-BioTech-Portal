@@ -56,9 +56,7 @@ body {
     justify-content: space-between;
     align-items: center;
 }
-.navbar-nav>li:first-child{
-    display: none;
-}
+
 @media (min-width: 768px) {
     .navbar-collapse.collapse {
         display: flex !important;

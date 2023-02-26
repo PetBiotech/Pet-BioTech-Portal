@@ -27,7 +27,7 @@ from flask_security import (Security, SQLAlchemyUserDatastore,
                             )
 from flask_security.utils import encrypt_password
 import flask_admin
-from flask_admin import BaseView, expose
+from flask_admin import BaseView, expose, AdminIndexView
 from flask_admin import helpers as admin_helpers
 # from flask_admin.contrib import sqlasql
 from datetime import datetime
@@ -780,7 +780,37 @@ def index():
     # return render_template('index.html')
     return redirect("/admin")
 
+class hometab(AdminIndexView):
+    @expose('/', methods=["GET","POST"])
+    def home(self):
+        dashBoardCountData=[]
+        totalTests = analytical_test.query.count()
+        totalOrders= sample_stock.query.count()
+        positiveResults = analytical_test.query.filter_by(outcome_result="Positive").count()
+        positiveResults += analytical_test.query.filter_by(outcome_result="positive").count()
+        dashBoardCountData={
+            'totalTests':totalTests,
+            'totalOrders':totalOrders,
+            'positiveResults':positiveResults
+        }
+        location_data = db.session.query(FinalTestView.city_name,
+                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Positive', 1)])).label(
+                                             'positive_tests'),
+                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Negative', 1)])).label(
+                                             'negative_tests'),
+                                         db.func.count(db.case([(FinalTestView.outcome_result == 'null', 1)])).label(
+                                             'null_tests'),
+                                         db.func.count(FinalTestView.outcome_result).label(
+                                             'total_outcome_results')
+                                         ).group_by(FinalTestView.city_name).order_by(db.desc('total_outcome_results')).all()
+        orderDateDataRows = db.session.query(db.func.DATE(sample_stock.created_date), db.func.count())\
+            .filter(sample_stock.created_date >= '2018-01-01 00:00:01').group_by(db.func.DATE(sample_stock.created_date)).all()
 
+
+        orderDateData = [tuple(row) for row in orderDateDataRows]
+        return self.render('admin/index.html', dashBoardCountData=dashBoardCountData, location_data=location_data,orderDateData=orderDateData)
+
+    
 # creating a class object of testUserView imported from Model_views.py
 class testUserView(BaseView):
 
@@ -1015,57 +1045,30 @@ admin = flask_admin.Admin(
     '',
     base_template='my_master.html',
     template_mode='bootstrap3',
+    index_view=hometab(name="Dashboard"),
 )
 
 
-class dashboardView(BaseView):
-    def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-        if current_user.has_role('superuser') or current_user.has_role('user'):
-            return True
-        return False
+##class dashboardView(BaseView):
+##    def is_accessible(self):
+##        if not current_user.is_active or not current_user.is_authenticated:
+##            return False
+##        if current_user.has_role('superuser') or current_user.has_role('user'):
+##            return True
+##        return False
 
-    @expose('/')
-    def index(self):
-        dashBoardCountData=[]
-        totalTests = analytical_test.query.count()
-        totalOrders= sample_stock.query.count()
-        positiveResults = analytical_test.query.filter_by(outcome_result="Positive").count()
-        positiveResults += analytical_test.query.filter_by(outcome_result="positive").count()
-        dashBoardCountData={
-            'totalTests':totalTests,
-            'totalOrders':totalOrders,
-            'positiveResults':positiveResults
-        }
-        location_data = db.session.query(FinalTestView.city_name,
-                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Positive', 1)])).label(
-                                             'positive_tests'),
-                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Negative', 1)])).label(
-                                             'negative_tests'),
-                                         db.func.count(db.case([(FinalTestView.outcome_result == 'null', 1)])).label(
-                                             'null_tests'),
-                                         db.func.count(FinalTestView.outcome_result).label(
-                                             'total_outcome_results')
-                                         ).group_by(FinalTestView.city_name).order_by(db.desc('total_outcome_results')).all()
-        orderDateDataRows = db.session.query(db.func.DATE(sample_stock.created_date), db.func.count())\
-            .filter(sample_stock.created_date >= '2018-01-01 00:00:01').group_by(db.func.DATE(sample_stock.created_date)).all()
-
-
-        orderDateData = [tuple(row) for row in orderDateDataRows]
-        return self.render('admin/dashboard.html', dashBoardCountData=dashBoardCountData, location_data=location_data,orderDateData=orderDateData)
-
+    
 
 
 ########################################### Admin vies for the database table#######################################################
 # visible only for admin
-admin.add_view(dashboardView(name="Dashboard",
-               endpoint='dashboard'))
+##admin.add_view(dashboardView(name="Dashboard",
+##               endpoint='dashboard'))
 # orders
 admin.add_view(testUserView(name="Create Order",
-               endpoint='usertest'))
+               endpoint='usertest', menu_icon_type='glyph', menu_icon_value='glyphicon glyphicon-plus'))
 admin.add_view(sampleStock(sample_stock, db.session,
-               name="Show Orders"))
+               name="Show Orders",menu_icon_type='glyph', menu_icon_value='glyphicon glyphicon-search'))
 
 # invoice menu
 admin.add_view(invoiceDetails(invoice_details, db.session,
@@ -1083,7 +1086,7 @@ admin.add_view(receiveDetails(receive_details, db.session,
 
 # result
 admin.add_view(analyticalTest(analytical_test, db.session,
-               name="Result"))
+               name="Result",menu_icon_type='glyph', menu_icon_value='glyphicon glyphicon-list-alt'))
 
 # Function updates (type of test /  required samples)
 admin.add_view(Allspecies(species, db.session, name="Species",
@@ -1097,7 +1100,7 @@ admin.add_view(clinicalTestViews(clinicalTest, db.session,
 
 # final table
 admin.add_view(finalTestTableView(FinalTestView, db.session,
-               name="Summary"))
+               name="Summary",menu_icon_type='glyph', menu_icon_value='glyphicon glyphicon-plus'))
 
 # admins and employees
 admin.add_view(MyModelView(Profile, db.session,
