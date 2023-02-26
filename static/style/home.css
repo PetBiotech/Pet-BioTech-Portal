@@ -190,7 +190,8 @@ p {
     height: 60vh;
     /* height: fit-content; */
     background-color: rgb(255, 224, 183);
-    background: linear-gradient(132deg, rgb(227, 244, 253) 0.00%, rgb(170, 209, 226) 100.00%);
+    background-color: #f4f4f4;
+    /* background: linear-gradient(132deg, rgb(227, 244, 253) 0.00%, rgb(170, 209, 226) 100.00%); */
     border-radius: 10px;
     display: flex;
     justify-content: center;
@@ -200,9 +201,33 @@ p {
 .dashboard .leftDashboard .graphBody1{
     display: flex;
 }
+/* .modebar{
+    display: none;
+} */
+.js-plotly-plot .plotly .modebar-group {
+    display: none;
+}
+.js-plotly-plot .plotly .modebar-group:nth-child(3) {
+    display: block;
+}
+.anychart-credits {
+    display: none;
+}
 .dashboard .leftDashboard .graphBody2{
     display: none;
 }
 .dashboard .leftDashboard .graphBody3{
     display: none;
+}
+.dashboard .leftDashboard .graphBody2{
+    width: 1000px;
+    height: 400px;
+    overflow: auto;
+    padding: 20px 20px 50px 20px;
+}
+.dashboard .leftDashboard .graphBody2 .calenderGraphBody{
+    width: 100%;
+    min-height: 100px;
+    overflow: auto;
+    /* padding:50px 0px; */
 }

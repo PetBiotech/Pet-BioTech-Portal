@@ -1038,7 +1038,29 @@ class dashboardView(BaseView):
             'totalOrders':totalOrders,
             'positiveResults':positiveResults
         }
-        return self.render('admin/dashboard.html', dashBoardCountData=dashBoardCountData)
+        location_data = db.session.query(FinalTestView.city_name,
+                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Positive', 1)])).label(
+                                             'positive_tests'),
+                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Negative', 1)])).label(
+                                             'negative_tests'),
+                                         db.func.count(db.case([(FinalTestView.outcome_result == 'null', 1)])).label(
+                                             'null_tests'),
+                                         db.func.count(FinalTestView.outcome_result).label(
+                                             'total_outcome_results')
+                                         ).group_by(FinalTestView.city_name).order_by(db.desc('total_outcome_results')).all()
+        # orderDateData =  db.session.query(sample_stock.created_date,db.func.count()).group_by(sample_stock.created_date).all()
+        # orderDateData = db.session.query(db.func.DATE(sample_stock.created_date),db.func.count()).filter(sample_stock.created_date != '0001-01-01 00:00:01').group_by(db.func.DATE(sample_stock.created_date)).all()
+        # orderDateData = db.session.query(db.func.DATE(sample_stock.created_date), db.func.count()).filter(
+        #     sample_stock.created_date >= '2018-01-01 00:00:01').group_by(db.func.DATE(sample_stock.created_date)).all()
+        orderDateDataRows = db.session.query(db.func.DATE(sample_stock.created_date), db.func.count())\
+            .filter(sample_stock.created_date >= '2018-01-01 00:00:01')\
+            .group_by(db.func.DATE(sample_stock.created_date)).all()
+
+
+        orderDateData = [tuple(row) for row in orderDateDataRows]
+        return self.render('admin/dashboard.html', dashBoardCountData=dashBoardCountData, location_data=location_data,orderDateData=orderDateData)
+
+
 
 ########################################### Admin vies for the database table#######################################################
 # visible only for admin

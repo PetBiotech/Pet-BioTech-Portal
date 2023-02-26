@@ -10,16 +10,24 @@
         background-color: #ffffff;
     }
 </style>
+<head>
+
+</head>
 <div class="dashboard">
     <div class="leftDashboard">
         <div class="dashBoardNavbar">
-            <button onclick="showGraph(1)">Order History</button>
-            <button onclick="showGraph(2)">Location statistics</button>
-            <button onclick="showGraph(3)">Tests statistics</button>
+            <button onclick="showGraph(1)">Location statistics</button>
+            <button onclick="showGraph(2)">Order History</button>
+            <!-- <button onclick="showGraph(3)">Tests statistics</button> -->
         </div>
-        <div class="graphBody graphBody1" id="graphBody1">1</div>
-        <div class="graphBody graphBody2" id="graphBody2">2</div>
-        <div class="graphBody graphBody3" id="graphBody3">3</div>
+        <div class="graphBody graphBody1" id="graphBody1">
+        </div>
+        <div class="graphBody graphBody2" id="graphBody2">
+            <div class="calenderGraphBody" id="calenderGraphBody"></div>
+        </div>
+        <div class="graphBody graphBody3" id="graphBody3">
+            <canvas id="myCanvas3"></canvas>
+        </div>
     </div>
     <div class="centerDivider">.</div>
     <div class="rightDashboard">
@@ -37,14 +45,130 @@
         </div>
     </div>
 </div>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-calendar.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-data-adapter.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>
 <script>
-    const showGraph=(n)=>{
-        let graphBlock=document.querySelectorAll(".graphBody");
+    const showGraph = (n) => {
+        let graphBlock = document.querySelectorAll(".graphBody");
         graphBlock.forEach(element => {
-            element.style.display="none";
+            element.style.display = "none";
         });
-        document.getElementById("graphBody"+n).style.display="flex";
+        if(n==1){
+            document.getElementById("graphBody" + n).style.display = "flex";
+        }else{
+            document.getElementById("graphBody" + n).style.display = "block";
+        } 
     }
+
+    // Charts
+    var trace1 = {
+    x: [{% for row in location_data %}'{% if row[0] %}{{row[0]}}{% else %}Other{% endif %}',{% endfor %}],
+    y: [{% for row in location_data %}{{row[1]}}{% if not loop.last %},{% endif %}{% endfor %}],
+    name: 'Positive',
+    type: 'bar',
+    marker: {color: '#FF4052'}
+    // maeker: {color:'linear-gradient(top, #C7B9FF, #FFFBF1)'}
+    };
+
+    var trace2 = {
+    x: [{% for row in location_data %}'{% if row[0] %}{{row[0]}}{% else %}Other{% endif %}',{% endfor %}],
+    y: [{% for row in location_data %}{{row[2]}}{% if not loop.last %},{% endif %}{% endfor %}],
+    name: 'Negative',
+    type: 'bar',
+    marker: {color: '#00FF92'}
+    };
+
+    var trace3 = {
+    x: [{% for row in location_data %}'{% if row[0] %}{{row[0]}}{% else %}Other{% endif %}',{% endfor %}],
+    y: [{% for row in location_data %}{{row[3]}}{% if not loop.last %},{% endif %}{% endfor %}],
+    name: 'Null',
+    type: 'bar',
+    marker: {color: '#E425F0'}
+    };
+
+    var data = [trace3, trace2, trace1];
+    var layout = {
+        barmode: 'stack',
+        plot_bgcolor: 'transparent',
+        paper_bgcolor: '#151515',
+        hovermode:'x',
+        font:{
+            color:'#ffffff'
+        }
+    };
+    var config = {responsive: true};
+    Plotly.newPlot('graphBody1', data, layout, {scrollZoom: true},config);
+    
+    // 
+    // 
+    // 
+    // 
+    // Graph for date and order orderDateData
+    anychart.onDocumentReady(function() {
+    // Create the calendar chart
+    var chart = anychart.calendar();
+
+    // Set the data
+    var data = {{ orderDateData|tojson }};
+    chart.data(data);
+
+    // Set the container where the chart will be displayed
+    chart.container("calenderGraphBody");
+    chart.listen('chartDraw', function() {
+        document.getElementById('calenderGraphBody').style.height = chart.getActualHeight() + 'px';
+    });
+    // configure days
+    var days = chart.days();
+    days.hovered().fill("#FF3808");
+    days.normal().stroke("#15151500");
+    days.hovered().stroke("#FF0000");
+    days.noDataFill("#f4f4f4");
+    days.noDataHatchFill(null);
+    days.noDataStroke("#151515");
+    days.spacing(5);
+    // configure weeks
+    var weeks = chart.weeks();
+    weeks.showWeekends(true);
+    weeks.labels().fontColor("#8200EA");
+    weeks.labels().fontWeight(600);
+    weeks.labels().fontStyle('regular');
+    weeks.rightSpace(10);
+    // configure months
+    var months = chart.months();
+    months.stroke("#0767B1", 2);
+    months.noDataStroke("#808080",1);
+    months.labels().fontColor("#151515");
+    months.labels().fontWeight(600);
+    months.labels().fontStyle('regular');
+    months.underSpace(5);
+    // configure years
+    years = chart.years();
+    years.inverted(true);
+    years.background("#f4f4f4");
+    years.title().fontColor("#151515");
+    years.title().fontSize(24);
+    years.title().fontWeight(600);
+    years.underSpace(20);
+    // create and configure a color scale.
+    var customColorScale = anychart.scales.ordinalColor();
+    //configure a custom color scale
+    customColorScale.ranges([
+    {less: 15},
+    {from: 15, to: 30},
+    {greater: 30},
+    ]);
+    customColorScale.colors(["#80bdef", "#317dba", "#01579b"]);
+
+    // set the color scale as the color scale of the chart
+    chart.colorScale(customColorScale);
+
+    // configure the color range
+    chart.colorRange().length("90%");
+    // Draw the chart
+    chart.draw();
+    });
 </script>
 {% endif %}
 {% endblock body %}
