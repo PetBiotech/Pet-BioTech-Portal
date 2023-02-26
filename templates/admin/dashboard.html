@@ -88,7 +88,15 @@
     marker: {color: '#E425F0'}
     };
 
-    var data = [trace3, trace2, trace1];
+    var trace4 = {
+    x: [{% for row in location_data %}'{% if row[0] %}{{row[0]}}{% else %}Other{% endif %}',{% endfor %}],
+    y: [{% for row in location_data %}{{row[4]}}{% if not loop.last %},{% endif %}{% endfor %}],
+    name: 'Total',
+    type: 'line',
+    marker: {color: '#ffffff'}
+    };
+
+    var data = [trace3, trace2, trace1,trace4];
     var layout = {
         barmode: 'stack',
         plot_bgcolor: 'transparent',
