@@ -198,6 +198,18 @@ p {
     align-items: center;
     margin: 20px 10px;
 }
+.dashboard .leftDashboard .graphBody i{
+    animation: 2s rotation infinite linear;
+    font-size: 36px;
+}
+@keyframes rotation{
+    from{
+        transform: rotateZ(0deg);
+    }
+    to {
+        transform: rotateZ(360deg);
+    }
+}
 .dashboard .leftDashboard .graphBody1{
     display: flex;
 }
@@ -227,7 +239,10 @@ p {
 }
 .dashboard .leftDashboard .graphBody2 .calenderGraphBody{
     width: 100%;
-    min-height: 100px;
+    min-height: 100%;
     overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     /* padding:50px 0px; */
 }

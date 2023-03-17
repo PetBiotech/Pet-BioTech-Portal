@@ -42,6 +42,7 @@
             <!-- <button onclick="showGraph(3)">Tests statistics</button> -->
         </div>
         <div class="graphBody graphBody1" id="graphBody1">
+            <i class="fa-solid fa-spinner spinner1"></i>
         </div>
         <div class="graphBody graphBody2" id="graphBody2">
             <div class="calenderGraphBody" id="calenderGraphBody"></div>
@@ -66,6 +67,7 @@
         </div>
     </div>
 </div>
+  <script src="https://kit.fontawesome.com/f72c18304b.js" crossorigin="anonymous"></script>
     <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-core.min.js"></script>
     <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-calendar.min.js"></script>
     <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-data-adapter.min.js"></script>
@@ -128,8 +130,10 @@
         }
     };
     var config = {responsive: true};
-    Plotly.newPlot('graphBody1', data, layout, {scrollZoom: true},config);
-    
+    function removeLoader(){
+        document.querySelector(".spinner1").style.display="none";
+    }
+    Plotly.newPlot('graphBody1', data, layout, {scrollZoom: true},config,removeLoader());
     // 
     // 
     // 
@@ -142,7 +146,6 @@
     // Set the data
     var data = {{ orderDateData|tojson }};
     chart.data(data);
-
     // Set the container where the chart will be displayed
     chart.container("calenderGraphBody");
     chart.listen('chartDraw', function() {

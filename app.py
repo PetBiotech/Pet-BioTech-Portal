@@ -11,7 +11,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask import Flask, jsonify, request, session
 from sqlalchemy import ForeignKey, ForeignKeyConstraint
 from model_views import (
-    dashboardView,finalTestTableView,MyModelView, usernameview, pickupDetails,
+    finalTestTableView,MyModelView, usernameview, pickupDetails,
     receiveDetails, Allspecies, Allspecimen, ourEmployee, locationViews, clinicalTestViews
 )
 import pyautogui
@@ -1049,21 +1049,10 @@ admin = flask_admin.Admin(
 )
 
 
-##class dashboardView(BaseView):
-##    def is_accessible(self):
-##        if not current_user.is_active or not current_user.is_authenticated:
-##            return False
-##        if current_user.has_role('superuser') or current_user.has_role('user'):
-##            return True
-##        return False
-
     
 
 
 ########################################### Admin vies for the database table#######################################################
-# visible only for admin
-##admin.add_view(dashboardView(name="Dashboard",
-##               endpoint='dashboard'))
 # orders
 admin.add_view(testUserView(name="Create Order",
                endpoint='usertest', menu_icon_type='glyph', menu_icon_value='glyphicon glyphicon-plus'))
@@ -1185,27 +1174,6 @@ def update_sample_id():
             for iDetails in in_det:
                 iDetails.sample_id=eachTest.sample_id
     db.session.commit()
-    
-    
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# Dashboard
-# 
-# 
-# 
-# 
-# 
-#
-#
-#
 
 
 # --------------------------------
