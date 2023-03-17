@@ -14,7 +14,7 @@ from model_views import (
     finalTestTableView,MyModelView, usernameview, pickupDetails,
     receiveDetails, Allspecies, Allspecimen, ourEmployee, locationViews, clinicalTestViews
 )
-import pyautogui
+
 import forms
 import os
 from flask_admin.actions import action
