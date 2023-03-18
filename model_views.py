@@ -20,8 +20,8 @@ from markupsafe import Markup
 # from app import generate_id,process_data
 # from app import generate_id
 
-app = Flask(__name__)
-db = SQLAlchemy()
+##app = Flask(__name__)
+##db = SQLAlchemy()
 
 
 class MyModelView(sqla.ModelView):

@@ -1,11 +1,12 @@
+import pymysql
 # Create dummy secrey key so we can use sessions
 SECRET_KEY = '123456790'
 
 
 
 # Create in-memory database
-DATABASE_FILE = 'test.db'
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_FILE
+
+SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
 #SQLALCHEMY_ECHO = True
 
 # Flask-Security config
