@@ -14,14 +14,14 @@ import random
 from flask_admin.model import typefmt
 from flask_sqlalchemy import SQLAlchemy
 from markupsafe import Markup
-import pyautogui
+
 
 
 # from app import generate_id,process_data
 # from app import generate_id
 
-app = Flask(__name__)
-db = SQLAlchemy()
+##app = Flask(__name__)
+##db = SQLAlchemy()
 
 
 class MyModelView(sqla.ModelView):

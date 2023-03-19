@@ -14,7 +14,6 @@ from model_views import (
     finalTestTableView,MyModelView, usernameview, pickupDetails,
     receiveDetails, Allspecies, Allspecimen, ourEmployee, locationViews, clinicalTestViews
 )
-import pyautogui
 import forms
 import os
 from flask_admin.actions import action
@@ -533,7 +532,7 @@ class Username(db.Model, UserMixin):
 user_datastore = SQLAlchemyUserDatastore(db, Username, Profile)
 security = Security(app, user_datastore,
                     login_form=forms.ExtendedLoginForm)
-# register_form=forms.ExtendedRegisterForm)
+
 
 # --------------------------------
 # MODELS
@@ -793,23 +792,47 @@ class hometab(AdminIndexView):
             'totalOrders':totalOrders,
             'positiveResults':positiveResults
         }
-        location_data = db.session.query(FinalTestView.city_name,
-                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Positive', 1)])).label(
-                                             'positive_tests'),
-                                         db.func.count(db.case([(FinalTestView.outcome_result == 'Negative', 1)])).label(
-                                             'negative_tests'),
-                                         db.func.count(db.case([(FinalTestView.outcome_result == 'null', 1)])).label(
-                                             'null_tests'),
-                                         db.func.count(FinalTestView.outcome_result).label(
-                                             'total_outcome_results')
-                                         ).group_by(FinalTestView.city_name).order_by(db.desc('total_outcome_results')).all()
-        orderDateDataRows = db.session.query(db.func.DATE(sample_stock.created_date), db.func.count())\
-            .filter(sample_stock.created_date >= '2018-01-01 00:00:01').group_by(db.func.DATE(sample_stock.created_date)).all()
+        location_data = db.session.query(
+            FinalTestView.city_name,
+            db.func.count(
+                db.case(
+                    (FinalTestView.outcome_result == 'Positive', 1),
+                    (FinalTestView.outcome_result == 'Negative', None),
+                    else_=None
+                )
+            ).label('positive_tests'),
+            db.func.count(
+                db.case(
+                    (FinalTestView.outcome_result == 'Negative', 1),
+                    (FinalTestView.outcome_result == 'Positive', None),
+                    else_=None
+                )
+            ).label('negative_tests'),
+            db.func.count(
+                db.case(
+                    (FinalTestView.outcome_result == 'null', 1),
+                    else_=None
+                )
+            ).label('null_tests'),
+            db.func.count(FinalTestView.outcome_result).label('total_outcome_results')
+        ).group_by(FinalTestView.city_name).order_by(db.desc('total_outcome_results')).all()
 
+        orderDateDataRows = db.session.query(
+            db.func.DATE(sample_stock.created_date),
+            db.func.count()
+        ).filter(
+            sample_stock.created_date >= '2018-01-01 00:00:01'
+        ).group_by(
+            db.func.DATE(sample_stock.created_date)
+        ).all()
 
         orderDateData = [tuple(row) for row in orderDateDataRows]
-        return self.render('admin/index.html', dashBoardCountData=dashBoardCountData, location_data=location_data,orderDateData=orderDateData)
-
+        return self.render(
+            'admin/index.html',
+            dashBoardCountData=dashBoardCountData,
+            location_data=location_data,
+            orderDateData=orderDateData
+        )
     
 # creating a class object of testUserView imported from Model_views.py
 class testUserView(BaseView):
