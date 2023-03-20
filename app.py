@@ -764,7 +764,7 @@ class FinalTestView(db.Model):
 
     def __repr__(self):
         return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
-
+db.create_all()
 # --------------------------------
 # MODEL VIEW CLASSES
 # --------------------------------
