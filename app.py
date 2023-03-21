@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, render_template
 import json
+import pyautogui
 from wtforms import SelectField
 from flask_wtf import FlaskForm
 import string
@@ -751,10 +752,8 @@ class invoice(db.Model):
 
 class FinalTestView(db.Model):
     __tablename__ = 'FinalTestView'
-    test_id = db.Column(db.Integer, db.ForeignKey(
-        'analytical_test.test_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
-    sample_id = db.Column(db.Integer, db.ForeignKey(
-        'analytical_test.sample_id'), unique=False)
+    test_id = db.Column(db.Integer, primary_key=True)
+    sample_id = db.Column(db.Integer, unique=False)
     test_name = db.Column(db.String(250), nullable=True)
     created_date = db.Column(db.DateTime, nullable=True)
     outcome_result = db.Column(db.String(100), nullable=True)
