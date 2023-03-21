@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, render_template
 import json
-import pyautogui
 from wtforms import SelectField
 from flask_wtf import FlaskForm
 import string
@@ -53,6 +52,270 @@ user_profiles = db.Table(
     db.Column('username_id', db.Integer(), db.ForeignKey('username.id')),
     db.Column('profile_id', db.Integer(), db.ForeignKey('profile.id'))
 )
+
+######################################################################################################
+
+
+class Profile(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+    def __str__(self):
+        return self.name
+
+
+class Username(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
+    username = db.Column(db.String(255), unique=True, index=True)
+    password = db.Column(db.String(255))
+    email = db.Column(db.String(255), unique=True)
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Profile',
+                            secondary=user_profiles,
+                            backref=db.backref('users', lazy='dynamic'))
+
+    def __str__(self):
+        return self.email
+
+# --------------------------------
+# MODELS
+# --------------------------------
+
+
+# Db for the test
+
+
+class invoice_details(db.Model):
+    invoice_details_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    invoice_id = db.Column(db.Integer, nullable=True)
+    sample_id = db.Column(db.Integer, nullable=True)
+    test_name = db.Column(db.String(200), nullable=True)
+    amount = db.Column(db.Integer, nullable=True)
+    created_by = db.Column(db.String(100), nullable=True)
+    created_date = db.Column(db.DateTime(timezone=True),
+                             default=datetime.utcnow, nullable=True)
+    updated_by = db.Column(db.String(100), nullable=True)
+    updated_date = db.Column(db.DateTime(timezone=True),
+                             default=datetime.utcnow, nullable=True)
+
+    def __str__(self):
+        return self.invoice_id
+
+
+class payment_history(db.Model):
+    payment_history_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    invoice_id = db.Column(db.Integer, nullable=True)
+    sample_id = db.Column(db.Integer, nullable=True)
+    payment_mode = db.Column(db.String(200), nullable=True)
+    total_amount = db.Column(db.Integer, nullable=True)
+    paid_amount = db.Column(db.Integer, nullable=True)
+    balance_amt = db.Column(db.Integer, nullable=True)
+    status = db.Column(db.Integer, nullable=True)
+    payment_collected_by = db.Column(db.String(100), nullable=True)
+    payment_collected_date = db.Column(db.DateTime(timezone=True),
+                                       default=datetime.utcnow, nullable=True)
+
+    def __str__(self):
+        return self.payment_mode
+
+
+class pickup_details(db.Model):
+    pickup_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    sample_id = db.Column(db.Integer, nullable=True)
+    picked_by = db.Column(db.String(100), nullable=True)
+    picked_date = db.Column(db.DateTime(timezone=True),
+                            default=datetime.utcnow, nullable=True)
+    remarks = db.Column(db.String(500), nullable=True)
+    created_by = db.Column(db.String(100), nullable=True)
+
+    def __str__(self):
+        return self.sample_id
+
+
+class location(db.Model):
+    location_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    location_name = db.Column(db.String(500), nullable=True)
+    sflag = db.Column(db.Integer, nullable=True)
+    iflag = db.Column(db.Integer, nullable=True)
+
+
+class receive_details(db.Model):
+    receive_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    sample_id = db.Column(db.Integer, nullable=True)
+    received_by = db.Column(db.String(100), nullable=True)
+    received_date = db.Column(db.DateTime(timezone=True),
+                              default=datetime.utcnow, nullable=True)
+    remarks = db.Column(db.String(500), nullable=True)
+    created_by = db.Column(db.String(100), nullable=True)
+    vet_remarks = db.Column(db.String(500), nullable=True)
+    vetremarks_updated_by = db.Column(db.String(100), nullable=True)
+    vetremarks_updated_date = db.Column(db.DateTime(timezone=True),
+                                        default=datetime.utcnow, nullable=True)
+
+    def __str__(self):
+        return self.receive_id
+
+
+class sample_stock(db.Model):
+    sample_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    sample_code = db.Column(db.String(100), nullable=True)
+    sample_name = db.Column(db.String(100), nullable=True)
+    sample_description = db.Column(db.String(1000), nullable=True)
+    outcome_remarks = db.Column(db.String(1000), nullable=True)
+    noof_samples = db.Column(db.Integer, nullable=True)
+    customer_name = db.Column(db.String(100), nullable=True)
+    address = db.Column(db.String(1000), nullable=True)
+    mobile_no = db.Column(db.Integer, nullable=True)
+    phone_no = db.Column(db.Integer, nullable=True)
+    email_id = db.Column(db.String(100), nullable=True)
+    created_by = db.Column(db.String(100), nullable=True)
+    created_time = db.Column(db.Time(timezone=True),
+                             default=datetime.utcnow, nullable=True)
+    counciler_status = db.Column(db.Integer, nullable=True)
+    customer_status = db.Column(db.Integer, nullable=True)
+    pickup_status = db.Column(db.Integer, nullable=True)
+    created_date = db.Column(db.DateTime(timezone=True),
+                             default=datetime.utcnow, nullable=True)
+    total_sample_price = db.Column(db.Integer, nullable=True)
+    price_unit = db.Column(db.Integer, nullable=True)
+    customer_accepted_by = db.Column(db.String(100), nullable=True)
+    customer_accepted_date = db.Column(db.DateTime(timezone=True),
+                                       default=datetime.utcnow, nullable=True)
+    result_upload_status = db.Column(db.Integer, nullable=True)
+    pickup_accepted_status = db.Column(db.Integer, nullable=True)
+    receive_accepted_status = db.Column(db.Integer, nullable=True)
+    invoice_status = db.Column(db.Integer, nullable=True)
+    updated_by = db.Column(db.String(100), nullable=True)
+    updated_date = db.Column(db.DateTime(timezone=True),
+                             default=datetime.utcnow, nullable=True)
+    age = db.Column(db.Integer, nullable=True)
+    gender = db.Column(db.String(25), nullable=True)
+    pincode = db.Column(db.Integer, nullable=True)
+    location_id = db.Column(db.Integer, nullable=True)
+    breed = db.Column(db.String(100), nullable=True)
+    # gender = db.Column(db.String(100), nullable=True)
+    species_id = db.Column(db.Integer, nullable=True)
+    specimen_id = db.Column(db.Integer, nullable=True)
+    
+    species_name=db.Column(db.String(100),nullable=True)
+    specimen_name=db.Column(db.String(1000),nullable=True)
+    location_name=db.Column(db.String(100),nullable=True)
+    def __str__(self):
+        return self.sample_code
+
+
+class clinicalTest(db.Model):
+    clinicalTest_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    clinicalTest_name = db.Column(db.String(500), nullable=True)
+
+
+class species(db.Model):
+    species_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    species_name = db.Column(db.String(100), nullable=True)
+
+    def __str__(self):
+        return self.species_id
+
+
+class specimen(db.Model):
+    specimen_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    specimen_name = db.Column(db.String(500), nullable=True)
+
+    def __str__(self):
+        return self.specimen_id
+
+
+class AnalyticalTestForm(FlaskForm):
+    outcome_result = SelectField('Outcome Result', choices=[(
+        'positive', 'Positive'), ('negative', 'Negative')])
+
+
+class analytical_test(db.Model):
+    test_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    test_name = db.Column(db.String(200), nullable=True)
+    sample_id = db.Column(db.Integer, nullable=True)
+    outcome_result = db.Column(db.String(100), nullable=True)
+    test_outcome_created_by = db.Column(db.String(100), nullable=True)
+    test_outcome_created_date = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.Integer, nullable=True)
+    remarks=db.Column(db.String(1000),nullable=True)
+
+
+class employee(db.Model):
+    id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    emp_id = db.Column(db.Integer, nullable=True)
+    emp_name = db.Column(db.String(200), nullable=True)
+    password = db.Column(db.String(200), nullable=True)
+    designation = db.Column(db.String(200), nullable=True)
+    status = db.Column(db.Integer, nullable=True)
+    email_id = db.Column(db.String(200), nullable=True)
+    phone_no = db.Column(db.Integer, nullable=True)
+    address = db.Column(db.String(500), nullable=True)
+    location = db.Column(db.Integer, nullable=True)
+    usercode = db.Column(db.String(20), nullable=True)
+
+    def __str__(self):
+        return self.emp_id
+
+
+class invoice(db.Model):
+    invoice_id = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    sample_id = db.Column(db.Integer, nullable=True)
+    total = db.Column(db.Integer, nullable=True)
+    gst = db.Column(db.Integer, nullable=True)
+    gst_amount = db.Column(db.Integer, nullable=True)
+    created_by = db.Column(db.String(100), nullable=True)
+    created_date = db.Column(db.DateTime(timezone=True),
+                             default=datetime.utcnow, nullable=True)
+    updated_by = db.Column(db.String(100), nullable=True)
+    updated_date = db.Column(db.DateTime(timezone=True),
+                             default=datetime.utcnow, nullable=True)
+    paid_amount = db.Column(db.Integer, nullable=True)
+    bal_amt = db.Column(db.Integer, nullable=True)
+    status = db.Column(db.Integer, nullable=True)
+    others_amt = db.Column(db.Integer, nullable=True)
+    others_remarks = db.Column(db.String(500), nullable=True)
+    grand_total = db.Column(db.Integer, nullable=True)
+
+    def __str__(self):
+        return self.grand_total
+
+
+class FinalTestView(db.Model):
+    __tablename__ = 'FinalTestView'
+    test_id = db.Column(db.Integer, primary_key=True)
+    sample_id = db.Column(db.Integer, unique=False)
+    test_name = db.Column(db.String(250), nullable=True)
+    created_date = db.Column(db.DateTime, nullable=True)
+    outcome_result = db.Column(db.String(100), nullable=True)
+    city_name = db.Column(db.String(100), nullable=True)
+    client_name = db.Column(db.String(250), nullable=True)
+    sample_code = db.Column(db.String(100), nullable=True)
+
+    def __repr__(self):
+        return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
+
+
+# --------------------------------
+# MODEL VIEW CLASSES
+# --------------------------------
+
+
 
 class sampleStock(MyModelView):
     def is_accessible(self):
@@ -306,8 +569,6 @@ class invoices(MyModelView):
                 print("An Error has occured")
             db.session.commit()
             print("Data has been edited")
-            # refresh code
-            pyautogui.hotkey('f5')
         if is_created:
             print("New Data has been added")
 
@@ -361,8 +622,7 @@ class paymentHistory(MyModelView):
                 print("An Error has occured")
             db.session.commit()
             print("Data has been edited")
-            # refresh code
-            pyautogui.hotkey('f5')
+
         if is_created:
             print("New Data has been added")
             
@@ -488,39 +748,9 @@ class analyticalTest(MyModelView):
                 print("An Error has occured")
             db.session.commit()
             print("Data has been edited")
-            # refresh code
-            pyautogui.hotkey('f5')
         if is_created:
             print("New Data has been added")
 
-
-######################################################################################################
-
-
-class Profile(db.Model, RoleMixin):
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
-
-    def __str__(self):
-        return self.name
-
-
-class Username(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(255))
-    last_name = db.Column(db.String(255))
-    username = db.Column(db.String(255), unique=True, index=True)
-    password = db.Column(db.String(255))
-    email = db.Column(db.String(255), unique=True)
-    active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Profile',
-                            secondary=user_profiles,
-                            backref=db.backref('users', lazy='dynamic'))
-
-    def __str__(self):
-        return self.email
 
 
 # --------------------------------
@@ -535,238 +765,7 @@ security = Security(app, user_datastore,
                     login_form=forms.ExtendedLoginForm)
 
 
-# --------------------------------
-# MODELS
-# --------------------------------
 
-
-# Db for the test
-
-
-class invoice_details(db.Model):
-    invoice_details_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    invoice_id = db.Column(db.Integer, nullable=True)
-    sample_id = db.Column(db.Integer, nullable=True)
-    test_name = db.Column(db.String(200), nullable=True)
-    amount = db.Column(db.Integer, nullable=True)
-    created_by = db.Column(db.String(100), nullable=True)
-    created_date = db.Column(db.DateTime(timezone=True),
-                             default=datetime.utcnow, nullable=True)
-    updated_by = db.Column(db.String(100), nullable=True)
-    updated_date = db.Column(db.DateTime(timezone=True),
-                             default=datetime.utcnow, nullable=True)
-
-    def __str__(self):
-        return self.invoice_id
-
-
-class payment_history(db.Model):
-    payment_history_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    invoice_id = db.Column(db.Integer, nullable=True)
-    sample_id = db.Column(db.Integer, nullable=True)
-    payment_mode = db.Column(db.String(200), nullable=True)
-    total_amount = db.Column(db.Integer, nullable=True)
-    paid_amount = db.Column(db.Integer, nullable=True)
-    balance_amt = db.Column(db.Integer, nullable=True)
-    status = db.Column(db.Integer, nullable=True)
-    payment_collected_by = db.Column(db.String(100), nullable=True)
-    payment_collected_date = db.Column(db.DateTime(timezone=True),
-                                       default=datetime.utcnow, nullable=True)
-
-    def __str__(self):
-        return self.payment_mode
-
-
-class pickup_details(db.Model):
-    pickup_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    sample_id = db.Column(db.Integer, nullable=True)
-    picked_by = db.Column(db.String(100), nullable=True)
-    picked_date = db.Column(db.DateTime(timezone=True),
-                            default=datetime.utcnow, nullable=True)
-    remarks = db.Column(db.String(500), nullable=True)
-    created_by = db.Column(db.String(100), nullable=True)
-
-    def __str__(self):
-        return self.sample_id
-
-
-class location(db.Model):
-    location_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    location_name = db.Column(db.String(500), nullable=True)
-    sflag = db.Column(db.Integer, nullable=True)
-    iflag = db.Column(db.Integer, nullable=True)
-
-
-class receive_details(db.Model):
-    receive_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    sample_id = db.Column(db.Integer, nullable=True)
-    received_by = db.Column(db.String(100), nullable=True)
-    received_date = db.Column(db.DateTime(timezone=True),
-                              default=datetime.utcnow, nullable=True)
-    remarks = db.Column(db.String(500), nullable=True)
-    created_by = db.Column(db.String(100), nullable=True)
-    vet_remarks = db.Column(db.String(500), nullable=True)
-    vetremarks_updated_by = db.Column(db.String(100), nullable=True)
-    vetremarks_updated_date = db.Column(db.DateTime(timezone=True),
-                                        default=datetime.utcnow, nullable=True)
-
-    def __str__(self):
-        return self.receive_id
-
-
-class sample_stock(db.Model):
-    sample_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    sample_code = db.Column(db.String(100), nullable=True)
-    sample_name = db.Column(db.String(100), nullable=True)
-    sample_description = db.Column(db.String(1000), nullable=True)
-    outcome_remarks = db.Column(db.String(1000), nullable=True)
-    noof_samples = db.Column(db.Integer, nullable=True)
-    customer_name = db.Column(db.String(100), nullable=True)
-    address = db.Column(db.String(1000), nullable=True)
-    mobile_no = db.Column(db.Integer, nullable=True)
-    phone_no = db.Column(db.Integer, nullable=True)
-    email_id = db.Column(db.String(100), nullable=True)
-    created_by = db.Column(db.String(100), nullable=True)
-    created_time = db.Column(db.Time(timezone=True),
-                             default=datetime.utcnow, nullable=True)
-    counciler_status = db.Column(db.Integer, nullable=True)
-    customer_status = db.Column(db.Integer, nullable=True)
-    pickup_status = db.Column(db.Integer, nullable=True)
-    created_date = db.Column(db.DateTime(timezone=True),
-                             default=datetime.utcnow, nullable=True)
-    total_sample_price = db.Column(db.Integer, nullable=True)
-    price_unit = db.Column(db.Integer, nullable=True)
-    customer_accepted_by = db.Column(db.String(100), nullable=True)
-    customer_accepted_date = db.Column(db.DateTime(timezone=True),
-                                       default=datetime.utcnow, nullable=True)
-    result_upload_status = db.Column(db.Integer, nullable=True)
-    pickup_accepted_status = db.Column(db.Integer, nullable=True)
-    receive_accepted_status = db.Column(db.Integer, nullable=True)
-    invoice_status = db.Column(db.Integer, nullable=True)
-    updated_by = db.Column(db.String(100), nullable=True)
-    updated_date = db.Column(db.DateTime(timezone=True),
-                             default=datetime.utcnow, nullable=True)
-    age = db.Column(db.Integer, nullable=True)
-    gender = db.Column(db.String(25), nullable=True)
-    pincode = db.Column(db.Integer, nullable=True)
-    location_id = db.Column(db.Integer, nullable=True)
-    breed = db.Column(db.String(100), nullable=True)
-    # gender = db.Column(db.String(100), nullable=True)
-    species_id = db.Column(db.Integer, nullable=True)
-    specimen_id = db.Column(db.Integer, nullable=True)
-    
-    species_name=db.Column(db.String(100),nullable=True)
-    specimen_name=db.Column(db.String(1000),nullable=True)
-    location_name=db.Column(db.String(100),nullable=True)
-    def __str__(self):
-        return self.sample_code
-
-
-class clinicalTest(db.Model):
-    clinicalTest_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    clinicalTest_name = db.Column(db.String(500), nullable=True)
-
-
-class species(db.Model):
-    species_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    species_name = db.Column(db.String(100), nullable=True)
-
-    def __str__(self):
-        return self.species_id
-
-
-class specimen(db.Model):
-    specimen_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    specimen_name = db.Column(db.String(500), nullable=True)
-
-    def __str__(self):
-        return self.specimen_id
-
-
-class AnalyticalTestForm(FlaskForm):
-    outcome_result = SelectField('Outcome Result', choices=[(
-        'positive', 'Positive'), ('negative', 'Negative')])
-
-
-class analytical_test(db.Model):
-    test_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    test_name = db.Column(db.String(200), nullable=True)
-    sample_id = db.Column(db.Integer, nullable=True)
-    outcome_result = db.Column(db.String(100), nullable=True)
-    test_outcome_created_by = db.Column(db.String(100), nullable=True)
-    test_outcome_created_date = db.Column(db.DateTime, nullable=True)
-    status = db.Column(db.Integer, nullable=True)
-    remarks=db.Column(db.String(1000),nullable=True)
-
-
-class employee(db.Model):
-    id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    emp_id = db.Column(db.Integer, nullable=True)
-    emp_name = db.Column(db.String(200), nullable=True)
-    password = db.Column(db.String(200), nullable=True)
-    designation = db.Column(db.String(200), nullable=True)
-    status = db.Column(db.Integer, nullable=True)
-    email_id = db.Column(db.String(200), nullable=True)
-    phone_no = db.Column(db.Integer, nullable=True)
-    address = db.Column(db.String(500), nullable=True)
-    location = db.Column(db.Integer, nullable=True)
-    usercode = db.Column(db.String(20), nullable=True)
-
-    def __str__(self):
-        return self.emp_id
-
-
-class invoice(db.Model):
-    invoice_id = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    sample_id = db.Column(db.Integer, nullable=True)
-    total = db.Column(db.Integer, nullable=True)
-    gst = db.Column(db.Integer, nullable=True)
-    gst_amount = db.Column(db.Integer, nullable=True)
-    created_by = db.Column(db.String(100), nullable=True)
-    created_date = db.Column(db.DateTime(timezone=True),
-                             default=datetime.utcnow, nullable=True)
-    updated_by = db.Column(db.String(100), nullable=True)
-    updated_date = db.Column(db.DateTime(timezone=True),
-                             default=datetime.utcnow, nullable=True)
-    paid_amount = db.Column(db.Integer, nullable=True)
-    bal_amt = db.Column(db.Integer, nullable=True)
-    status = db.Column(db.Integer, nullable=True)
-    others_amt = db.Column(db.Integer, nullable=True)
-    others_remarks = db.Column(db.String(500), nullable=True)
-    grand_total = db.Column(db.Integer, nullable=True)
-
-    def __str__(self):
-        return self.grand_total
-
-
-class FinalTestView(db.Model):
-    __tablename__ = 'FinalTestView'
-    test_id = db.Column(db.Integer, primary_key=True)
-    sample_id = db.Column(db.Integer, unique=False)
-    test_name = db.Column(db.String(250), nullable=True)
-    created_date = db.Column(db.DateTime, nullable=True)
-    outcome_result = db.Column(db.String(100), nullable=True)
-    city_name = db.Column(db.String(100), nullable=True)
-    client_name = db.Column(db.String(250), nullable=True)
-    sample_code = db.Column(db.String(100), nullable=True)
-
-    def __repr__(self):
-        return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
-db.create_all()
-# --------------------------------
-# MODEL VIEW CLASSES
-# --------------------------------
 
 # --------------------------------
 # FLASK VIEWS / ROUTES
