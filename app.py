@@ -763,7 +763,7 @@ class FinalTestView(db.Model):
 
     def __repr__(self):
         return f"<FinalTestView(test_id={self.test_id}, sample_id={self.sample_id}, test_name='{self.test_name}', created_date='{self.created_date}', outcome_result='{self.outcome_result}', city_name='{self.city_name}', client_name='{self.client_name}')>"
-
+db.create_all()
 # --------------------------------
 # MODEL VIEW CLASSES
 # --------------------------------
@@ -1208,11 +1208,11 @@ if __name__ == '__main__':
     # db.session.commit()
     # db.drop_all()
     # Build a sample db on the fly, if one does not exist yet.
-    # db.create_all()
+    db.create_all()
     ##    app_dir = os.path.realpath(os.path.dirname(__file__))
     ##    database_path = os.path.join(app_dir, app.config['DATABASE_FILE'])
     # if not os.path.exists(database_path):
-    # build_sample_db()
+    build_sample_db()
     # sql = "ALTER TABLE invoice ADD CONSTRAINT fk_invoice_sample FOREIGN KEY (sample_id) REFERENCES sample_stock(sample_id) ON DELETE CASCADE;"
     # db.session.execute(sql)
     # db.session.commit()
