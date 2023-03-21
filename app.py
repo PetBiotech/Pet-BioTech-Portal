@@ -783,7 +783,7 @@ class hometab(AdminIndexView):
         dashBoardCountData=[]
         totalTests = analytical_test.query.count()
         totalOrders= sample_stock.query.count()
-        positiveResults = analytical_test.query.filter_by(outcome_result="Positive").count()
+        #positiveResults = analytical_test.query.filter_by(outcome_result="Positive").count()
         positiveResults += analytical_test.query.filter_by(outcome_result="positive").count()
         dashBoardCountData={
             'totalTests':totalTests,
