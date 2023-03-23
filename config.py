@@ -5,8 +5,8 @@ SECRET_KEY = '123456790'
 
 
 # Create in-memory database
-#SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://admin:Petbiotech12@pbt-portal.czufb7vlwyub.ap-south-1.rds.amazonaws.com/ebdb'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+#SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://admin:Pass@pbt-portal.czufb7vlwyub.ap-south-1.rds.amazonaws.com/ebdb'
 #SQLALCHEMY_ECHO = True
 
 # Flask-Security config
